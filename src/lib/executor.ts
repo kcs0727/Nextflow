@@ -38,6 +38,25 @@ function runStatusFromNodeRuns(nodeRuns: NodeRunHistory[]): HistoryStatus {
 
 export async function executeScope(scope: HistoryScope) {
   const store = useWorkflowStore.getState();
+  
+  // Auto-save workflow before running
+  const { workflowId, workflowName, nodes: allNodes, edges: allEdges } = store;
+  if (workflowId && workflowName) {
+    try {
+      await fetch("/api/workflows", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: workflowId,
+          name: workflowName,
+          graph: { nodes: allNodes, edges: allEdges },
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to auto-save workflow:", error);
+    }
+  }
+
   const runnable = store.getRunnableNodes(scope);
   if (!runnable.length) return;
 

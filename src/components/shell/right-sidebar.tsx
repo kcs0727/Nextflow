@@ -8,6 +8,7 @@ import type { WorkflowRunHistory } from "@/types/workflow";
 
 type RightSidebarProps = {
   runs: WorkflowRunHistory[];
+  workflowName?: string;
 };
 
 const statusClasses: Record<string, string> = {
@@ -17,12 +18,17 @@ const statusClasses: Record<string, string> = {
   running: "bg-amber-500/15 text-amber-300 border-amber-500/40",
 };
 
-export function RightSidebar({ runs }: RightSidebarProps) {
+export function RightSidebar({ runs, workflowName }: RightSidebarProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
     <aside className="krea-scroll w-[350px] overflow-y-auto border-l border-white/10 bg-[#0c0d13]/96 p-4 backdrop-blur-xl">
-      <h2 className="mb-3 text-sm font-semibold tracking-[0.1em] text-zinc-200">Workflow History</h2>
+      <div className="mb-4">
+        <h2 className="text-sm font-semibold tracking-[0.1em] text-zinc-200">Workflow History</h2>
+        {workflowName && (
+          <p className="mt-1 text-xs text-zinc-400">Project: {workflowName}</p>
+        )}
+      </div>
 
       <div className="space-y-3 overflow-y-auto pr-1">
         {runs.length === 0 ? (
@@ -73,6 +79,27 @@ export function RightSidebar({ runs }: RightSidebarProps) {
                         </span>
                       </div>
                       <p className="text-[11px] text-zinc-400">{node.durationMs}ms</p>
+                      
+                      {/* Show outputs */}
+                      {node.outputs && Object.keys(node.outputs).length > 0 && (
+                        <div className="mt-2 space-y-1 border-t border-white/10 pt-2">
+                          {Object.entries(node.outputs).map(([key, value]) => (
+                            <div key={key} className="text-[10px]">
+                              <p className="text-zinc-400">{key}:</p>
+                              <p className="break-all text-zinc-300 max-h-12 overflow-hidden">
+                                {typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:')) ? (
+                                  <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+                                    {value.length > 50 ? value.substring(0, 50) + '...' : value}
+                                  </a>
+                                ) : (
+                                  <span>{String(value).substring(0, 80)}</span>
+                                )}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       {node.error ? <p className="mt-1 text-[11px] text-rose-300">{node.error}</p> : null}
                     </div>
                   ))}

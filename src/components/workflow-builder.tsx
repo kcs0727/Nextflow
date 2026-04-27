@@ -14,6 +14,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { SignInButton, useAuth } from "@clerk/nextjs";
 import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Scissors, PanelRightOpen } from "lucide-react";
+import toast from "react-hot-toast";
 import { LeftSidebar } from "@/components/shell/left-sidebar";
 import { RightSidebar } from "@/components/shell/right-sidebar";
 import { nodeTypes } from "@/components/flow/node-types";
@@ -48,7 +49,8 @@ function WorkflowBuilderInner() {
     const { screenToFlowPosition } = useReactFlow();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
+    const [activeTool, setActiveTool] = useState<"select" | "hand">("hand");
+    const [activeButtonId, setActiveButtonId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -84,23 +86,62 @@ function WorkflowBuilderInner() {
     }, [setSelectedNodeIds]);
 
     const saveWorkflow = useCallback(async () => {
-        await fetch("/api/workflows", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: workflowId,
-                name: workflowName,
-                graph: { nodes, edges },
-            }),
-        });
+        setActiveButtonId("save");
+        setTimeout(() => setActiveButtonId(null), 300);
+        try {
+            const response = await fetch("/api/workflows", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: workflowId,
+                    name: workflowName,
+                    graph: { nodes, edges },
+                }),
+            });
+            if (response.ok) {
+                toast.success("Workflow saved successfully!");
+            } else {
+                toast.error("Failed to save workflow");
+            }
+        } catch (err) {
+            toast.error("Error saving workflow");
+            console.error(err);
+        }
     }, [workflowId, workflowName, nodes, edges]);
 
     const actions = useMemo(
         () => [
-            { label: "Run Full", icon: Play, fn: () => executeScope("full") },
-            { label: "Run Selected", icon: Play, fn: () => executeScope("partial") },
-            { label: "Run Single", icon: Play, fn: () => executeScope("single") },
-            { label: "Save", icon: Save, fn: saveWorkflow },
+            { 
+                id: "run-full",
+                label: "Run Full", 
+                icon: Play, 
+                fn: () => {
+                    setActiveButtonId("run-full");
+                    setTimeout(() => setActiveButtonId(null), 300);
+                    executeScope("full");
+                }
+            },
+            { 
+                id: "run-selected",
+                label: "Run Selected", 
+                icon: Play, 
+                fn: () => {
+                    setActiveButtonId("run-selected");
+                    setTimeout(() => setActiveButtonId(null), 300);
+                    executeScope("partial");
+                }
+            },
+            { 
+                id: "run-single",
+                label: "Run Single", 
+                icon: Play, 
+                fn: () => {
+                    setActiveButtonId("run-single");
+                    setTimeout(() => setActiveButtonId(null), 300);
+                    executeScope("single");
+                }
+            },
+            { id: "save", label: "Save", icon: Save, fn: saveWorkflow },
         ],
         [saveWorkflow],
     );
@@ -146,7 +187,11 @@ function WorkflowBuilderInner() {
                                 key={item.label}
                                 onClick={() => item.fn()}
                                 disabled={!isAuthenticated}
-                                className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#625c5c40] px-3 py-2 text-xs text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] backdrop-blur transition hover:border-white/20 hover:bg-[#1a1c23]"
+                                className={`flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] backdrop-blur transition ${
+                                    activeButtonId === item.id
+                                        ? "bg-cyan-500/40 border-cyan-500/60 text-white"
+                                        : "bg-[#625c5c40] hover:border-white/20 hover:bg-[#1a1c23]"
+                                }`}
                             >
                                 <item.icon className="h-3.5 w-3.5" />
                                 {item.label}
@@ -311,11 +356,9 @@ function WorkflowBuilderInner() {
                         </div>
                     </div>
                 ) : null}
-
-                
             </main>
 
-            {historyOpen ? <RightSidebar runs={history} /> : null}
+            {historyOpen ? <RightSidebar runs={history} workflowName={workflowName} /> : null}
         </div>
     );
 }
