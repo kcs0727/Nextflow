@@ -39,6 +39,7 @@ type WorkflowState = {
   onConnect: (connection: Connection) => boolean;
   addNode: (kind: WorkflowNodeKind, at?: { x: number; y: number }) => void;
   deleteSelected: () => void;
+  cutSelectedEdges: () => void;
   updateNodeValue: (nodeId: string, key: string, value: string) => void;
   setConnectedInput: (nodeId: string, key: string, connected: boolean) => void;
   setNodeOutput: (nodeId: string, key: string, value: string) => void;
@@ -165,6 +166,34 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         })),
       edges,
       selectedNodeIds: [],
+      ...pushUndo(state),
+    });
+  },
+
+  cutSelectedEdges: () => {
+    const state = get();
+    if (!state.selectedNodeIds.length) return;
+
+    const selected = new Set(state.selectedNodeIds);
+    const edges = state.edges.filter((edge) => !selected.has(edge.source) && !selected.has(edge.target));
+
+    const connectedInputsByNode = new Map<string, Record<string, boolean>>();
+    for (const edge of edges) {
+      if (!edge.targetHandle) continue;
+      const val = connectedInputsByNode.get(edge.target) ?? {};
+      val[edge.targetHandle] = true;
+      connectedInputsByNode.set(edge.target, val);
+    }
+
+    set({
+      edges,
+      nodes: state.nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          connectedInputs: connectedInputsByNode.get(node.id) ?? {},
+        },
+      })),
       ...pushUndo(state),
     });
   },

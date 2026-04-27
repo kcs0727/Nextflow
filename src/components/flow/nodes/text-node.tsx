@@ -7,13 +7,13 @@ import { useWorkflowStore } from "@/store/workflow-store";
 import { NodeShell } from "@/components/flow/node-shell";
 import { OutputHandle } from "@/components/flow/handles";
 
-function TextNode({ id, data }: NodeProps) {
+function TextNode({ id, data, selected }: NodeProps) {
     const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
     const typedData = data as WorkflowNodeData;
     const value = typedData.values.text ?? "";
 
     return (
-        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
             <textarea
                 value={value}
                 onChange={(e) => updateNodeValue(id, "text", e.target.value)}

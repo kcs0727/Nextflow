@@ -13,7 +13,7 @@ import { Upload, TriangleAlert } from "lucide-react";
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ACCEPTED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
-function UploadImageNode({ id, data }: NodeProps) {
+function UploadImageNode({ id, data, selected }: NodeProps) {
     const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
     const setNodeStatus = useWorkflowStore((s) => s.setNodeStatus);
     const typedData = data as WorkflowNodeData;
@@ -46,7 +46,7 @@ function UploadImageNode({ id, data }: NodeProps) {
     };
 
     return (
-        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
             <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}

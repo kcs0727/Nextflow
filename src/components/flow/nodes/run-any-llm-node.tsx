@@ -38,7 +38,7 @@ function TextField({
   );
 }
 
-function RunAnyLlmNode({ id, data }: NodeProps) {
+function RunAnyLlmNode({ id, data, selected }: NodeProps) {
   const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
   const typedData = data as WorkflowNodeData;
   const [expandResult, setExpandResult] = useState(true);
@@ -60,7 +60,7 @@ function RunAnyLlmNode({ id, data }: NodeProps) {
   const imagesConnected = Boolean(typedData.connectedInputs.images);
 
   return (
-    <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+  <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
       {/* Input Handles with labels */}
       <InputHandle id="system_prompt" top="22%" label="system" />
       <InputHandle id="user_message" top="50%" label="message" />

@@ -7,14 +7,14 @@ import { useWorkflowStore } from "@/store/workflow-store";
 import { InputHandle, OutputHandle } from "@/components/flow/handles";
 import { NodeShell } from "@/components/flow/node-shell";
 
-function ExtractFrameNode({ id, data }: NodeProps) {
+function ExtractFrameNode({ id, data, selected }: NodeProps) {
   const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
   const typedData = data as WorkflowNodeData;
   const videoConnected = Boolean(typedData.connectedInputs.video_url);
   const timestampConnected = Boolean(typedData.connectedInputs.timestamp);
 
-  return (
-    <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+    return (
+      <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
       {/* Input Handles */}
       <InputHandle id="video_url" top="35%" label="video" />
       <InputHandle id="timestamp" top="70%" label="time" />

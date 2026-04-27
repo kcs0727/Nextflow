@@ -55,6 +55,10 @@ button:disabled {
   cursor: grabbing;
 }
 
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
 .react-flow__background {
   opacity: 0.92;
 }

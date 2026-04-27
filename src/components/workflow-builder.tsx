@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { SignInButton, useAuth } from "@clerk/nextjs";
-import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Network, PanelRightOpen } from "lucide-react";
+import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Scissors, PanelRightOpen } from "lucide-react";
 import { LeftSidebar } from "@/components/shell/left-sidebar";
 import { RightSidebar } from "@/components/shell/right-sidebar";
 import { nodeTypes } from "@/components/flow/node-types";
@@ -30,12 +30,14 @@ function WorkflowBuilderInner() {
         workflowName,
         nodes,
         edges,
+        selectedNodeIds,
         history,
         onNodesChange,
         onEdgesChange,
         onConnect,
         addNode,
         deleteSelected,
+        cutSelectedEdges,
         setWorkflowName,
         setSelectedNodeIds,
         undo,
@@ -46,6 +48,7 @@ function WorkflowBuilderInner() {
     const { screenToFlowPosition } = useReactFlow();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -101,6 +104,15 @@ function WorkflowBuilderInner() {
         ],
         [saveWorkflow],
     );
+
+    const selectToolClass =
+        activeTool === "select"
+            ? "border-white/40 bg-white/18 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.18),0_10px_24px_rgba(0,0,0,0.35)]"
+            : "text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100";
+    const handToolClass =
+        activeTool === "hand"
+            ? "border-white/40 bg-white/18 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.18),0_10px_24px_rgba(0,0,0,0.35)]"
+            : "text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100";
 
 
     return (
@@ -168,10 +180,10 @@ function WorkflowBuilderInner() {
                     fitView
                     nodeTypes={nodeTypes}
                     proOptions={{ hideAttribution: true }}
-                    selectionOnDrag={isAuthenticated}
-                    panOnDrag={isAuthenticated}
+                    selectionOnDrag={isAuthenticated && activeTool === "select"}
+                    panOnDrag={isAuthenticated && activeTool === "hand"}
                     panOnScroll={isAuthenticated}
-                    nodesDraggable={isAuthenticated}
+                    nodesDraggable={isAuthenticated && activeTool === "hand"}
                     nodesConnectable={isAuthenticated}
                     elementsSelectable={isAuthenticated}
                     minZoom={0.2}
@@ -196,7 +208,7 @@ function WorkflowBuilderInner() {
 
                         addNode(kind, position);
                     }}
-                    className="h-full w-full animate-[fadein_380ms_ease-out]"
+                    className={`h-full w-full animate-[fadein_380ms_ease-out] ${activeTool === "select" ? "cursor-crosshair" : ""}`}
                 >
                     <Background variant={BackgroundVariant.Dots} gap={22} size={1.3} color="#7d7d7d40" />
                     <Controls showInteractive={false} className="!hidden" />
@@ -218,29 +230,72 @@ function WorkflowBuilderInner() {
                 ) : null}
 
                 <div className="absolute bottom-4 left-4 z-30 flex items-center gap-2 rounded-2xl border border-white/10 bg-[#625c5c40] p-1 shadow-[0_14px_32px_rgba(0,0,0,0.4)] backdrop-blur-md">
-                    <button onClick={undo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                    <button onClick={undo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40 relative group" title="Undo">
                         <Undo2 className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Undo
+                        </span>
                     </button>
-                    <button onClick={redo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                    <button onClick={redo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40 relative group" title="Redo">
                         <Redo2 className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Redo
+                        </span>
                     </button>
-                    <button onClick={deleteSelected} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                    <button onClick={deleteSelected} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40 relative group" title="Delete Selected">
                         <Trash2 className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Delete
+                        </span>
                     </button>
                 </div>
 
                 <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-white/10 bg-[#625c5c40] p-2 shadow-[0_14px_32px_rgba(0,0,0,0.4)] backdrop-blur-md">
-                    <button disabled={!isAuthenticated} className="rounded-xl bg-[#24262f] hover:bg-[#1a1c23] p-2 text-zinc-100 disabled:opacity-40">
+                    <button 
+                        onClick={() => setSidebarCollapsed((v) => !v)}
+                        disabled={!isAuthenticated} 
+                        className="rounded-xl bg-[#24262f] hover:bg-[#1a1c23] p-2 text-zinc-100 disabled:opacity-40 relative group" 
+                        title="Add Node"
+                    >
                         <Plus className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Add Node
+                        </span>
                     </button>
-                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                    <button
+                        onClick={() => setActiveTool("select")}
+                        disabled={!isAuthenticated}
+                        className={`rounded-xl bg-[#24262f] hover:bg-[#1a1c23] p-2 text-zinc-100 transition disabled:opacity-40 relative group ${selectToolClass}`}
+                        aria-pressed={activeTool === "select"}
+                        title="Select Tool"
+                    >
                         <MousePointer2 className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Select
+                        </span>
                     </button>
-                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                    <button
+                        onClick={() => setActiveTool("hand")}
+                        disabled={!isAuthenticated}
+                        className={`rounded-xl bg-[#24262f] hover:bg-[#1a1c23] p-2 text-zinc-100 transition disabled:opacity-40 relative group ${handToolClass}`}
+                        aria-pressed={activeTool === "hand"}
+                        title="Hand Tool"
+                    >
                         <Hand className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Hand
+                        </span>
                     </button>
-                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
-                        <Network className="h-5 w-5" />
+                    <button
+                        onClick={() => cutSelectedEdges()}
+                        disabled={!isAuthenticated || selectedNodeIds.length === 0}
+                        className="rounded-xl border border-white/10 p-2 text-zinc-300 transition hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40 relative group"
+                        title="Cut connected edges"
+                    >
+                        <Scissors className="h-5 w-5" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 text-zinc-100 text-xs px-2 py-1 rounded whitespace-nowrap">
+                            Cut Edges
+                        </span>
                     </button>
                 </div>
 

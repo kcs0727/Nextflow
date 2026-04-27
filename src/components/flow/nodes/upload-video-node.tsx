@@ -12,7 +12,7 @@ import { Upload, TriangleAlert } from "lucide-react";
 const ACCEPTED_TYPES = ["video/mp4", "video/quicktime", "video/webm", "video/x-m4v"];
 const ACCEPTED_EXTENSIONS = [".mp4", ".mov", ".webm", ".m4v"];
 
-function UploadVideoNode({ id, data }: NodeProps) {
+function UploadVideoNode({ id, data, selected }: NodeProps) {
   const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
   const setNodeStatus = useWorkflowStore((s) => s.setNodeStatus);
   const typedData = data as WorkflowNodeData;
@@ -45,7 +45,7 @@ function UploadVideoNode({ id, data }: NodeProps) {
   };
 
   return (
-    <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+    <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}

@@ -40,13 +40,13 @@ function NumberField({
     );
 }
 
-function CropImageNode({ id, data }: NodeProps) {
+function CropImageNode({ id, data, selected }: NodeProps) {
     const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
     const typedData = data as WorkflowNodeData;
     const imageConnected = Boolean(typedData.connectedInputs.image_url);
 
     return (
-        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
             {/* Input Handles */}
             <InputHandle id="image_url" top="28%" label="image" />
             <InputHandle id="x_percent" top="48%" label="x %" />

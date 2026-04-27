@@ -7,14 +7,17 @@ type NodeShellProps = {
   title: string;
   status: "idle" | "running" | "success" | "failed";
   error?: string;
+  selected?: boolean;
   children: React.ReactNode;
 };
 
-export function NodeShell({ title, status, error, children }: NodeShellProps) {
+export function NodeShell({ title, status, error, selected, children }: NodeShellProps) {
   return (
     <div
       className={cn(
         "relative w-[300px] rounded-2xl border border-white/10 bg-[#11131a]/95 p-4 text-zinc-100 shadow-[0_16px_36px_rgba(0,0,0,0.48)] backdrop-blur-md transition-all duration-300",
+        selected &&
+          "border-white/70 bg-[#151922]/98 ring-2 ring-white/70 shadow-[0_0_0_1px_rgba(255,255,255,0.28),0_0_28px_rgba(255,255,255,0.18),0_18px_40px_rgba(0,0,0,0.5)]",
         status === "running" && "animate-node-pulse ring-2 ring-blue-400/70 shadow-[0_0_0_2px_rgba(78,126,255,0.2),0_16px_36px_rgba(0,0,0,0.5)]",
         status === "failed" && "ring-1 ring-rose-400/70",
       )}
