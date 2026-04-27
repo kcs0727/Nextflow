@@ -159,10 +159,10 @@ export const runAnyLlmTask = task({
         if (!userMessage.trim()) {
             throw new Error("LLM node requires a user message");
         }
-
+  
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: String(payload.model ?? process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite"),
+            model: String(payload.model ?? process.env.GEMINI_MODEL ?? "gemini-2.0-flash"),
             systemInstruction: payload.systemPrompt || undefined,
         });
 
@@ -194,11 +194,23 @@ export const runAnyLlmTask = task({
                 images_preview: JSON.stringify(images),
             };
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            if (message.includes("429") || message.toLowerCase().includes("quota")) {
+            console.log("LLM Error:", error);
+            
+            // Check for quota/rate limit errors (multiple ways to detect)
+            const isQuotaError = 
+                (error instanceof Error && (
+                    error.message.includes("429") || 
+                    error.message.includes("quota") ||
+                    error.message.toLowerCase().includes("quota") ||
+                    error.message.includes("rate limit")
+                )) ||
+                (error && typeof error === 'object' && 'status' in error && (error as any).status === 429);
+            
+            if (isQuotaError) {
+                console.log("Detected quota error - returning fallback message");
                 return {
                     output:
-                        "Gemini quota is unavailable for this API key. Set a billed GEMINI_API_KEY or switch to a key with quota.",
+                        "Gemini quota exceeded for this API key. Please set a billed GEMINI_API_KEY in your .env.local or upgrade your plan. For more info: https://ai.google.dev/gemini-api/docs/rate-limits",
                     images_preview: JSON.stringify(images),
                 };
             }
