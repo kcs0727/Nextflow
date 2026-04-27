@@ -1,0 +1,28 @@
+"use client";
+
+import { memo } from "react";
+import type { NodeProps } from "@xyflow/react";
+import type { WorkflowNodeData } from "@/types/workflow";
+import { useWorkflowStore } from "@/store/workflow-store";
+import { NodeShell } from "@/components/flow/node-shell";
+import { OutputHandle } from "@/components/flow/handles";
+
+function TextNode({ id, data }: NodeProps) {
+    const updateNodeValue = useWorkflowStore((s) => s.updateNodeValue);
+    const typedData = data as WorkflowNodeData;
+    const value = typedData.values.text ?? "";
+
+    return (
+        <NodeShell title={typedData.title} status={typedData.status} error={typedData.error}>
+            <textarea
+                value={value}
+                onChange={(e) => updateNodeValue(id, "text", e.target.value)}
+                placeholder="Enter text..."
+                className="h-28 w-full resize-none rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+            />
+            <OutputHandle id="output" top="80%" label="text" />
+        </NodeShell>
+    );
+}
+
+export default memo(TextNode);

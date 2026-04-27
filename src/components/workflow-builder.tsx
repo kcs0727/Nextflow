@@ -1,0 +1,274 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+    Background,
+    BackgroundVariant,
+    Controls,
+    MiniMap,
+    ReactFlow,
+    ReactFlowProvider,
+    useReactFlow,
+    type OnSelectionChangeParams,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { SignInButton, useAuth } from "@clerk/nextjs";
+import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Network, PanelRightOpen } from "lucide-react";
+import { LeftSidebar } from "@/components/shell/left-sidebar";
+import { RightSidebar } from "@/components/shell/right-sidebar";
+import { nodeTypes } from "@/components/flow/node-types";
+import { executeScope } from "@/lib/executor";
+import { useWorkflowStore } from "@/store/workflow-store";
+import type { WorkflowNodeKind } from "@/types/workflow";
+
+
+function WorkflowBuilderInner() {
+    const { userId } = useAuth();
+    const isAuthenticated = Boolean(userId);
+    const {
+        workflowId,
+        workflowName,
+        nodes,
+        edges,
+        history,
+        onNodesChange,
+        onEdgesChange,
+        onConnect,
+        addNode,
+        deleteSelected,
+        setWorkflowName,
+        setSelectedNodeIds,
+        undo,
+        redo,
+        loadGraph,
+        setHistory,
+    } = useWorkflowStore();
+    const { screenToFlowPosition } = useReactFlow();
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setHistory([]);
+            return;
+        }
+
+        const bootstrap = async () => {
+            const wfRes = await fetch("/api/workflows", { cache: "no-store" });
+            if (wfRes.ok) {
+                const wfData = await wfRes.json();
+                const latest = wfData.workflows?.[0];
+                if (latest) {
+                    const graph = latest.graphJson as { nodes: typeof nodes; edges: typeof edges };
+                    loadGraph(graph.nodes ?? [], graph.edges ?? [], latest.id, latest.name);
+                }
+            }
+
+            const runRes = await fetch(`/api/runs${workflowId ? `?workflowId=${workflowId}` : ""}`, {
+                cache: "no-store",
+            });
+            if (runRes.ok) {
+                const runData = await runRes.json();
+                setHistory(runData.runs ?? []);
+            }
+        };
+
+        void bootstrap();
+    }, [isAuthenticated, workflowId, loadGraph, setHistory]);
+
+    const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
+        setSelectedNodeIds((params.nodes ?? []).map((n) => n.id));
+    }, [setSelectedNodeIds]);
+
+    const saveWorkflow = useCallback(async () => {
+        await fetch("/api/workflows", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: workflowId,
+                name: workflowName,
+                graph: { nodes, edges },
+            }),
+        });
+    }, [workflowId, workflowName, nodes, edges]);
+
+    const actions = useMemo(
+        () => [
+            { label: "Run Full", icon: Play, fn: () => executeScope("full") },
+            { label: "Run Selected", icon: Play, fn: () => executeScope("partial") },
+            { label: "Run Single", icon: Play, fn: () => executeScope("single") },
+            { label: "Save", icon: Save, fn: saveWorkflow },
+        ],
+        [saveWorkflow],
+    );
+
+
+    return (
+        <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-[#090a0d] text-zinc-100">
+            <LeftSidebar
+                onAddNode={(kind) => {
+                    if (!isAuthenticated) return;
+                    addNode(kind);
+                }}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+                authenticated={isAuthenticated}
+            />
+
+            <main className="relative flex-1 bg-[#2d2d2d40]">
+
+                <div className="pointer-events-none absolute left-4 right-4 top-4 z-30 flex items-start justify-between">
+                    <div className="pointer-events-auto flex items-center gap-2 rounded-xl border border-white/10 bg-[#625c5c40] px-4 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.35)] backdrop-blur-md">
+                        <span className="h-2.5 w-2.5 rounded-full bg-zinc-300" />
+                        <input
+                            value={workflowName}
+                            onChange={(e) => setWorkflowName(e.target.value)}
+                            disabled={!isAuthenticated}
+                            className="w-[160px] bg-transparent text-sm font-medium text-zinc-100 outline-none"
+                        />
+                    </div>
+
+                    <div className="pointer-events-auto flex items-center gap-2">
+                        {actions.map((item) => (
+                            <button
+                                key={item.label}
+                                onClick={() => item.fn()}
+                                disabled={!isAuthenticated}
+                                className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#625c5c40] px-3 py-2 text-xs text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] backdrop-blur transition hover:border-white/20 hover:bg-[#1a1c23]"
+                            >
+                                <item.icon className="h-3.5 w-3.5" />
+                                {item.label}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setHistoryOpen((v) => !v)}
+                            className="rounded-xl border border-white/10 bg-[#625c5c40] p-2 text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] hover:bg-[#1a1c23]"
+                        >
+                            <PanelRightOpen className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={(changes) => {
+                        if (!isAuthenticated) return;
+                        onNodesChange(changes);
+                    }}
+                    onEdgesChange={(changes) => {
+                        if (!isAuthenticated) return;
+                        onEdgesChange(changes);
+                    }}
+                    onConnect={(connection) => {
+                        if (!isAuthenticated) return;
+                        onConnect(connection);
+                    }}
+                    onSelectionChange={onSelectionChange}
+                    fitView
+                    nodeTypes={nodeTypes}
+                    proOptions={{ hideAttribution: true }}
+                    selectionOnDrag={isAuthenticated}
+                    panOnDrag={isAuthenticated}
+                    panOnScroll={isAuthenticated}
+                    nodesDraggable={isAuthenticated}
+                    nodesConnectable={isAuthenticated}
+                    elementsSelectable={isAuthenticated}
+                    minZoom={0.2}
+                    maxZoom={2}
+                    deleteKeyCode={["Delete", "Backspace"]}
+                    onDragOver={(event) => {
+                        if (!isAuthenticated) return;
+                        event.preventDefault();
+                        event.dataTransfer.dropEffect = "move";
+                    }}
+                    onDrop={(event) => {
+                        if (!isAuthenticated) return;
+                        event.preventDefault();
+
+                        const kind = event.dataTransfer.getData("application/nextflow-node-kind") as WorkflowNodeKind;
+                        if (!kind) return;
+
+                        const position = screenToFlowPosition({
+                            x: event.clientX,
+                            y: event.clientY,
+                        });
+
+                        addNode(kind, position);
+                    }}
+                    className="h-full w-full animate-[fadein_380ms_ease-out]"
+                >
+                    <Background variant={BackgroundVariant.Dots} gap={22} size={1.3} color="#7d7d7d40" />
+                    <Controls showInteractive={false} className="!hidden" />
+                    <MiniMap
+                        className="!bottom-4 !right-4 !h-24 !w-36 !rounded-xl !border !border-white/10 !bg-[#625c5c40]"
+                        nodeColor="#7d89a9"
+                        maskColor="rgba(7,8,12,0.68)"
+                        pannable
+                        zoomable
+                    />
+                </ReactFlow>
+
+                {nodes.length === 0 ? (
+                    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+                        <p className="px-4 py-2 text-md tracking-wide text-zinc-400 font-semibold backdrop-blur-sm">
+                            Add a node to start
+                        </p>
+                    </div>
+                ) : null}
+
+                <div className="absolute bottom-4 left-4 z-30 flex items-center gap-2 rounded-2xl border border-white/10 bg-[#625c5c40] p-1 shadow-[0_14px_32px_rgba(0,0,0,0.4)] backdrop-blur-md">
+                    <button onClick={undo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <Undo2 className="h-5 w-5" />
+                    </button>
+                    <button onClick={redo} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <Redo2 className="h-5 w-5" />
+                    </button>
+                    <button onClick={deleteSelected} disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <Trash2 className="h-5 w-5" />
+                    </button>
+                </div>
+
+                <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-white/10 bg-[#625c5c40] p-2 shadow-[0_14px_32px_rgba(0,0,0,0.4)] backdrop-blur-md">
+                    <button disabled={!isAuthenticated} className="rounded-xl bg-[#24262f] hover:bg-[#1a1c23] p-2 text-zinc-100 disabled:opacity-40">
+                        <Plus className="h-5 w-5" />
+                    </button>
+                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <MousePointer2 className="h-5 w-5" />
+                    </button>
+                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <Hand className="h-5 w-5" />
+                    </button>
+                    <button disabled={!isAuthenticated} className="rounded-xl p-2 text-zinc-300 hover:bg-[#1a1c23] hover:text-zinc-100 disabled:opacity-40">
+                        <Network className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {!isAuthenticated ? (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#090a0d]/76 backdrop-blur-[1px]">
+                        <div className="rounded-2xl border border-white/12 bg-[#12141b]/95 p-6 text-center shadow-[0_16px_34px_rgba(0,0,0,0.5)]">
+                            <p className="mb-3 text-sm font-semibold text-zinc-200">Authentication required to use workflow actions</p>
+                            <SignInButton mode="modal">
+                                <button className="rounded-xl border border-white/15 bg-[#1d2029] px-4 py-2 text-sm font-semibold text-zinc-100">
+                                    Sign In to Continue
+                                </button>
+                            </SignInButton>
+                        </div>
+                    </div>
+                ) : null}
+
+                
+            </main>
+
+            {historyOpen ? <RightSidebar runs={history} /> : null}
+        </div>
+    );
+}
+
+export function WorkflowBuilder() {
+    return (
+        <ReactFlowProvider>
+            <WorkflowBuilderInner />
+        </ReactFlowProvider>
+    );
+}
