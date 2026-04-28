@@ -347,7 +347,7 @@ function WorkflowBuilderInner() {
                 {!isAuthenticated ? (
                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#090a0d]/76 backdrop-blur-[1px]">
                         <div className="rounded-2xl border border-white/12 bg-[#12141b]/95 p-6 text-center shadow-[0_16px_34px_rgba(0,0,0,0.5)]">
-                            <p className="mb-3 text-sm font-semibold text-zinc-200">Authentication required to use workflow actions</p>
+                            <p className="mb-3 text-sm font-semibold text-zinc-200">Authentication required to use NextFlow actions</p>
                             <SignInButton mode="modal">
                                 <button className="rounded-xl border border-white/15 bg-[#1d2029] px-4 py-2 text-sm font-semibold text-zinc-100">
                                     Sign In to Continue
