@@ -1,11 +1,12 @@
 "use client";
 
 import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
-import { Home, Sparkles, Folder, Search, Type, ImagePlus, Clapperboard, Crop, Film, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Home, Sparkles, Folder, Search, Type, ImagePlus, Clapperboard, Crop, Film, PanelLeftClose, PanelLeftOpen, Zap } from "lucide-react";
 import type { WorkflowNodeKind } from "@/types/workflow";
 
 type LeftSidebarProps = {
     onAddNode: (kind: WorkflowNodeKind) => void;
+    onLoadSampleWorkflow: () => void;
     collapsed: boolean;
     onToggleCollapse: () => void;
     authenticated: boolean;
@@ -20,7 +21,7 @@ const QUICK_ACCESS: Array<{ kind: WorkflowNodeKind; label: string; icon: React.R
     { kind: "extractFrameFromVideo", label: "Extract Frame from Video Node", icon: <Film className="h-4 w-4" /> },
 ];
 
-export function LeftSidebar({ onAddNode, collapsed, onToggleCollapse, authenticated }: LeftSidebarProps) {
+export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onToggleCollapse, authenticated }: LeftSidebarProps) {
     const { userId } = useAuth();
     const { user } = useUser();
     const displayName = user?.fullName || user?.username || user?.firstName || "Account";
@@ -49,6 +50,15 @@ export function LeftSidebar({ onAddNode, collapsed, onToggleCollapse, authentica
                     <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-bold text-zinc-100 transition-colors hover:bg-white/10">
                         <Home className="h-4 w-4 text-zinc-300" />
                         {!collapsed ? <span>Home</span> : null}
+                    </button>
+                    <button
+                        onClick={onLoadSampleWorkflow}
+                        disabled={!authenticated}
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-zinc-100 transition-colors hover:bg-white/10 disabled:opacity-40"
+                        title="Load sample marketing workflow"
+                    >
+                        <Zap className="h-4 w-4 text-zinc-300" />
+                        {!collapsed ? <span>Sample Workflow</span> : null}
                     </button>
                 </div>
 

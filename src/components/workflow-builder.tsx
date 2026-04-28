@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Background,
     BackgroundVariant,
@@ -13,13 +13,14 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { SignInButton, useAuth } from "@clerk/nextjs";
-import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Scissors, PanelRightOpen } from "lucide-react";
+import { Plus, Play, Save, Undo2, Redo2, Trash2, Hand, MousePointer2, Scissors, PanelRightOpen, Download, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeftSidebar } from "@/components/shell/left-sidebar";
 import { RightSidebar } from "@/components/shell/right-sidebar";
 import { nodeTypes } from "@/components/flow/node-types";
 import { executeScope } from "@/lib/executor";
 import { useWorkflowStore } from "@/store/workflow-store";
+import { createSampleWorkflow } from "@/lib/sample-workflow";
 import type { WorkflowNodeKind } from "@/types/workflow";
 
 
@@ -51,6 +52,7 @@ function WorkflowBuilderInner() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [activeTool, setActiveTool] = useState<"select" | "hand">("hand");
     const [activeButtonId, setActiveButtonId] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -109,6 +111,78 @@ function WorkflowBuilderInner() {
         }
     }, [workflowId, workflowName, nodes, edges]);
 
+    const exportWorkflow = useCallback(() => {
+        setActiveButtonId("export");
+        setTimeout(() => setActiveButtonId(null), 300);
+        try {
+            const data = {
+                name: workflowName || "workflow",
+                graph: { nodes, edges },
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${data.name}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            toast.success("Workflow exported successfully!");
+        } catch (err) {
+            toast.error("Error exporting workflow");
+            console.error(err);
+        }
+    }, [workflowName, nodes, edges]);
+
+    const importWorkflow = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.currentTarget.files?.[0];
+        if (!file) return;
+
+        try {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target?.result as string;
+                    const data = JSON.parse(content);
+                    
+                    if (data.graph?.nodes && data.graph?.edges) {
+                        if (data.name) {
+                            setWorkflowName(data.name);
+                        }
+                        loadGraph(data.graph.nodes, data.graph.edges, workflowId, data.name || workflowName);
+                        toast.success("Workflow imported successfully!");
+                    } else {
+                        throw new Error("Invalid workflow JSON format");
+                    }
+                } catch (err) {
+                    toast.error("Invalid JSON format");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        } catch (err) {
+            toast.error("Error importing workflow");
+            console.error(err);
+        }
+        
+        // Reset file input
+        event.currentTarget.value = "";
+    }, [workflowId, loadGraph, setWorkflowName, workflowName]);
+
+    const loadSampleWorkflow = useCallback(() => {
+        try {
+            const { nodes: sampleNodes, edges: sampleEdges } = createSampleWorkflow();
+            setWorkflowName("Sample Marketing Workflow");
+            loadGraph(sampleNodes, sampleEdges, workflowId, "Sample Marketing Workflow");
+            toast.success("Sample workflow loaded!");
+        } catch (err) {
+            toast.error("Error loading sample workflow");
+            console.error(err);
+        }
+    }, [workflowId, loadGraph, setWorkflowName]);
+
     const actions = useMemo(
         () => [
             { 
@@ -163,6 +237,7 @@ function WorkflowBuilderInner() {
                     if (!isAuthenticated) return;
                     addNode(kind);
                 }}
+                onLoadSampleWorkflow={loadSampleWorkflow}
                 collapsed={sidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
                 authenticated={isAuthenticated}
@@ -198,12 +273,45 @@ function WorkflowBuilderInner() {
                             </button>
                         ))}
                         <button
+                            onClick={exportWorkflow}
+                            disabled={!isAuthenticated}
+                            className={`flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] backdrop-blur transition ${
+                                activeButtonId === "export"
+                                    ? "bg-cyan-500/40 border-cyan-500/60 text-white"
+                                    : "bg-[#625c5c40] hover:border-white/20 hover:bg-[#1a1c23]"
+                            }`}
+                            title="Export workflow as JSON"
+                        >
+                            <Download className="h-3.5 w-3.5" />
+                            Export
+                        </button>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={!isAuthenticated}
+                            className={`flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] backdrop-blur transition ${
+                                activeButtonId === "import"
+                                    ? "bg-cyan-500/40 border-cyan-500/60 text-white"
+                                    : "bg-[#625c5c40] hover:border-white/20 hover:bg-[#1a1c23]"
+                            }`}
+                            title="Import workflow from JSON"
+                        >
+                            <Upload className="h-3.5 w-3.5" />
+                            Import
+                        </button>
+                        <button
                             onClick={() => setHistoryOpen((v) => !v)}
                             className="rounded-xl border border-white/10 bg-[#625c5c40] p-2 text-zinc-200 shadow-[0_8px_20px_rgba(0,0,0,0.28)] hover:bg-[#1a1c23]"
                         >
                             <PanelRightOpen className="h-4 w-4" />
                         </button>
                     </div>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json"
+                        onChange={importWorkflow}
+                        className="hidden"
+                    />
                 </div>
 
                 <ReactFlow
