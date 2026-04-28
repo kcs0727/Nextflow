@@ -68,13 +68,5 @@ npm run dev
 - Workflow and run history persistence in PostgreSQL via Prisma
 - Right sidebar run history with expandable node-level details
 - Undo/redo and keyboard delete support
-
-## Important Notes
-
-- This scaffold uses `/api/execute` for node execution behavior and demonstrates Gemini integration.
-- Crop/extract currently return transformed URL placeholders to keep local development simple; production should wire Trigger.dev tasks with FFmpeg + Transloadit uploads.
-- Upload nodes currently accept URLs manually; production should integrate full Transloadit upload widgets.
-
-## Required External Step
-
-You requested a pixel-perfect Krea clone and asked to explore Krea first. I cannot create accounts or sign in to third-party services from here, so I built a high-fidelity implementation shell and architecture that can be tuned to exact parity once visual references are provided.
+- Pre-built sammple workflow
+- import and export workflows
