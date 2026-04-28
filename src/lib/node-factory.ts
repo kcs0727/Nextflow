@@ -14,7 +14,7 @@ const DEFAULT_VALUES: Record<WorkflowNodeKind, Record<string, string>> = {
   text: { text: "" },
   uploadImage: { image_url: "" },
   uploadVideo: { video_url: "" },
-  runAnyLlm: { model: "gemini-2.0-flash", system_prompt: "", user_message: "" },
+  runAnyLlm: { model: "gemini-2.5-flash", system_prompt: "", user_message: "" },
   cropImage: {
     image_url: "",
     x_percent: "0",

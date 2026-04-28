@@ -134,7 +134,7 @@ export function createSampleWorkflow() {
         title: "LLM Node #1 - Product Description",
         kind: "runAnyLlm",
         values: {
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           system_prompt: "",
           user_message: "",
         },
@@ -151,7 +151,7 @@ export function createSampleWorkflow() {
         title: "LLM Node #2 - Marketing Summary",
         kind: "runAnyLlm",
         values: {
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           system_prompt: "",
           user_message: "",
         },

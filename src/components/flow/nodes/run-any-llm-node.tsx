@@ -71,13 +71,12 @@ function RunAnyLlmNode({ id, data, selected }: NodeProps) {
                 <label className="block space-y-1">
                     <span className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">Model</span>
                     <select
-                        value={typedData.values.model ?? "gemini-2.0-flash"}
+                        value={typedData.values.model ?? "gemini-2.5-flash"}
                         onChange={(e) => updateNodeValue(id, "model", e.target.value)}
                         className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
                     >
-                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                        <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
                     </select>
                 </label>
 
