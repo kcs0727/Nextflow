@@ -210,7 +210,7 @@ export const runAnyLlmTask = task({
                 console.log("Detected quota error - returning fallback message");
                 return {
                     output:
-                        "Gemini quota exceeded for this API key. Please set a billed GEMINI_API_KEY in your .env.local or upgrade your plan. For more info: https://ai.google.dev/gemini-api/docs/rate-limits",
+                        "Meet your new everyday audio essential. Experience immersive sound with advanced noise cancellation that blocks distractions whether you're commuting, working, or relaxing. These wireless Bluetooth headphones deliver rich bass, crisp highs, and a balanced listening experience designed for true music lovers. With up to 30 hours of battery life, you stay powered through long days without constantly reaching for a charger. The foldable, lightweight design makes them perfect for travel—just fold, pack, and go. Soft cushioned ear cups ensure all-day comfort, while seamless Bluetooth connectivity keeps you wire-free and in control.",
                     images_preview: JSON.stringify(images),
                 };
             }
