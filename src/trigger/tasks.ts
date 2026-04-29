@@ -162,7 +162,7 @@ export const runAnyLlmTask = task({
   
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: String(payload.model ?? process.env.GEMINI_MODEL ?? "gemini-2.0-flash"),
+            model: String(process.env.GEMINI_MODEL ?? "gemini-3-flash-preview"),
             systemInstruction: payload.systemPrompt || undefined,
         });
 
