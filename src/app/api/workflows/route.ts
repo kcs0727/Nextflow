@@ -20,6 +20,11 @@ export async function GET() {
     where: { userId },
     orderBy: { updatedAt: "desc" },
     take: 50,
+    include: {
+      _count: {
+        select: { runs: true },
+      },
+    },
   });
 
   return NextResponse.json({ workflows });

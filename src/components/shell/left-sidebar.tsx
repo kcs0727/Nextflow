@@ -1,7 +1,8 @@
 "use client";
 
 import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
-import { Home, Sparkles, Folder, Search, Type, ImagePlus, Clapperboard, Crop, Film, PanelLeftClose, PanelLeftOpen, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Home, Sparkles, Search, Type, ImagePlus, Clapperboard, Crop, Film, PanelLeftClose, PanelLeftOpen, Zap } from "lucide-react";
 import type { WorkflowNodeKind } from "@/types/workflow";
 
 type LeftSidebarProps = {
@@ -22,6 +23,7 @@ const QUICK_ACCESS: Array<{ kind: WorkflowNodeKind; label: string; icon: React.R
 ];
 
 export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onToggleCollapse, authenticated }: LeftSidebarProps) {
+    const router = useRouter();
     const { userId } = useAuth();
     const { user } = useUser();
     const displayName = user?.fullName || user?.username || user?.firstName || "Account";
@@ -32,7 +34,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
 
     return (
         <aside
-            className={`krea-scroll border-r border-white/6 bg-[#06070b] py-4 transition-[width,padding] duration-300 flex flex-col justify-between ${collapsed ? "w-[74px] px-2" : "w-[270px] px-3"
+            className={`krea-scroll border-r border-white/6 bg-[#06070b] py-4 transition-[width,padding] duration-300 flex flex-col justify-between ${collapsed ? "w-18.5 px-2" : "w-67.5 px-3"
                 }`}
         >
 
@@ -47,7 +49,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
                 </div>
 
                 <div className="mb-4 space-y-1 px-1">
-                    <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-bold text-zinc-100 transition-colors hover:bg-white/10">
+                    <button onClick={() => router.push("/")} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-bold text-zinc-100 transition-colors hover:bg-white/10">
                         <Home className="h-4 w-4 text-zinc-300" />
                         {!collapsed ? <span>Home</span> : null}
                     </button>
@@ -92,7 +94,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
                 {userId ? (
                     <div className="flex items-center gap-3 rounded-lg hover:bg-white/10 px-2 py-2">
                         <UserButton />
-                        {!collapsed ? <span className="max-w-[145px] truncate text-sm font-semibold text-zinc-100">{displayName}</span> : null}
+                        {!collapsed ? <span className="max-w-36.25 truncate text-sm font-semibold text-zinc-100">{displayName}</span> : null}
                     </div>
                 ) : (
                     <SignInButton mode="modal">

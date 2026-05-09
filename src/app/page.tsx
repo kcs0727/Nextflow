@@ -1,5 +1,5 @@
-import { WorkflowBuilder } from "@/components/workflow-builder";
+import { DashboardPage } from "@/components/dashboard-page";
 
 export default function Home() {
-  return <WorkflowBuilder />;
+  return <DashboardPage />;
 }
