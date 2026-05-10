@@ -114,7 +114,7 @@ export function DashboardPage() {
     };
 
     return (
-        <main className="min-h-screen bg-[#111111]  text-zinc-100">
+        <main className="min-h-screen bg-[#111111] ">
 
             <section className="relative border-b border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_28%),linear-gradient(180deg,#121318_0%,#090a0d_100%)]">
 

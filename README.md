@@ -13,6 +13,8 @@ NextFlow is a Krea-inspired LLM workflow builder using React Flow, Next.js App R
 - Clerk authentication
 - Google Gemini (`@google/generative-ai`)
 - Trigger.dev SDK (installed and script-ready)
+
+Note: Trigger.dev worker logic has been moved to the `trigger/` folder. Deploy the Next.js app to Vercel and the `trigger/` worker separately (e.g., Render) to avoid serverless timeouts.
 - Transloadit SDK (installed and env placeholders ready)
 - Lucide React
 

@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { WorkflowNodeKind } from "@/types/workflow";
 import { runs, tasks } from "@trigger.dev/sdk/v3";
-import "@/trigger/tasks";
 
 const payloadSchema = z.object({
     kind: z.enum([

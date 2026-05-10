@@ -34,7 +34,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
 
     return (
         <aside
-            className={`krea-scroll border-r border-white/6 bg-[#06070b] py-4 transition-[width,padding] duration-300 flex flex-col justify-between ${collapsed ? "w-18.5 px-2" : "w-67.5 px-3"
+            className={`krea-scroll border-r border-white/6 bg-oklch(14.5% 0 0) py-4 transition-[width,padding] duration-300 flex flex-col justify-between ${collapsed ? "w-18.5 px-2" : "w-67.5 px-3"
                 }`}
         >
 
