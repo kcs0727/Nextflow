@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "trigger dev",
-    "build": "trigger build",
+    "build": "tsc --noEmit",
     "start": "trigger start"
   },
   "dependencies": {
