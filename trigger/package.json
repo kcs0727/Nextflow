@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "trigger dev",
     "build": "tsc --noEmit",
-    "start": "cross-env NODE_OPTIONS=--max-old-space-size=384 trigger dev"
+    "start": "node render-start.cjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.40",
-    "cross-env": "^7.0.3",
     "trigger.dev": "^4.4.5",
     "typescript": "^5"
   }
