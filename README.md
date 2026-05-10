@@ -1,74 +1,106 @@
 # NextFlow
 
-NextFlow is a Krea-inspired LLM workflow builder using React Flow, Next.js App Router, Clerk auth, Prisma + Neon Postgres, and Trigger.dev-oriented execution endpoints.
+NextFlow is a Krea-inspired visual workflow builder that lets you assemble LLM and media-processing pipelines using a node-based canvas. It includes an editor and Trigger worker that runs background tasks.
 
-## Stack
+## Tech stack
 
 - Next.js (App Router) + TypeScript
-- Tailwind CSS
-- React Flow
-- Zustand
-- Zod
+- Tailwind CSS + semantic CSS variables
+- React Flow (node-based canvas)
+- Zustand (local/store state)
 - Prisma + PostgreSQL (Neon)
-- Clerk authentication
-- Google Gemini (`@google/generative-ai`)
-- Trigger.dev SDK (installed and script-ready)
+- Clerk (authentication)
+- Google Gemini (`@google/generative-ai`) for LLMs
+- Trigger.dev SDK for background worker flows
+- Transloadit for media processing
+- Lucide React for icons
 
-Note: Trigger.dev worker logic has been moved to the `trigger/` folder. Deploy the Next.js app to Vercel and the `trigger/` worker separately (e.g., Render) to avoid serverless timeouts.
-- Transloadit SDK (installed and env placeholders ready)
-- Lucide React
+The repository contains two runnable pieces:
+- App: the Next.js + React UI under the repository root
+- Trigger worker: background job worker in `trigger/`
 
-## Setup
 
-1. Install dependencies:
+## Local setup — App (Next.js)
+
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Copy env values:
+2. Required env vars (app)
+
+- `DATABASE_URL` — Postgres connection string used by Prisma
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` — Clerk publishable key (client)
+- `CLERK_SECRET_KEY` — Clerk secret key (server)
+- `GEMINI_API_KEY` — Google Generative AI API key (used by Trigger and optionally server)
+- `TRANSLOADIT_AUTH_KEY` — Transloadit auth key (server-only)
+- `TRANSLOADIT_AUTH_SECRET` — Transloadit auth secret (server-only)
+- `TRANSLOADIT_TEMPLATE_ID_IMAGE` — Transloadit template id for images
+- `TRANSLOADIT_TEMPLATE_ID_VIDEO` — Transloadit template id for videos
+- `TRIGGER_SECRET_KEY` 
+- `TRIGGER_PROJECT_REF`
+
+3. Prepare the database (Prisma)
 
 ```bash
-copy .env.example .env.local
-```
-
-3. Fill required env vars in `.env.local`:
-
-- `DATABASE_URL`
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- `CLERK_SECRET_KEY`
-- `GEMINI_API_KEY`
-
-4. Push Prisma schema:
-
-```bash
+# generate client
+npm run prisma:generate
+# run migrations or push schema
 npm run db:push
-npm run db:generate
+# or if you prefer migrations
+npm run migrate:dev
 ```
 
-5. Start app:
+4. Run the app
 
 ```bash
 npm run dev
+# open http://localhost:3000
 ```
 
-## Implemented Features
+## Local setup — Trigger worker
 
-- Left sidebar Quick Access with exactly 6 node buttons:
-  - Text Node
-  - Upload Image Node
-  - Upload Video Node
-  - Run Any LLM Node
-  - Crop Image Node
-  - Extract Frame from Video Node
-- React Flow canvas with pan/zoom, minimap, dot background, animated edges
-- Type-safe connection validation and cycle prevention (DAG enforcement)
-- Connected-input behavior that disables manual controls
-- LLM inline output rendering on LLM node
-- Parallel execution per DAG topological layers
-- Run scopes: full workflow, selected nodes (with dependencies), single node
-- Workflow and run history persistence in PostgreSQL via Prisma
-- Right sidebar run history with expandable node-level details
-- Undo/redo and keyboard delete support
-- Pre-built sammple workflow
-- import and export workflows
+1. Install and run from the `trigger/` folder
+
+```bash
+cd trigger
+npm install
+npm run dev
+```
+
+2. Env vars for the Trigger worker
+
+- `GEMINI_API_KEY` — Google Generative AI API key (LLM calls)
+- `TRANSLOADIT_AUTH_KEY` — Transloadit auth key (server-only)
+- `TRANSLOADIT_AUTH_SECRET` — Transloadit auth secret (server-only)
+- `TRANSLOADIT_TEMPLATE_ID_IMAGE` — Transloadit template id for images
+- `TRANSLOADIT_TEMPLATE_ID_VIDEO` — Transloadit template id for videos
+- `TRIGGER_SECRET_KEY` 
+- `TRIGGER_PROJECT_REF`
+- `TRIGGER_ACCESS_TOKEN`
+
+3. Running in production
+
+The `trigger/` package.json exposes `start` which runs `node render-start.cjs` (for Render-style startup). For other hosts follow Trigger.dev deployment docs.
+
+
+## Deployment
+
+- App: Deploy the Next.js app to Vercel (recommended) or any hosting that supports Node and Next.js App Router.
+- Trigger worker: Deploy separately to a background worker platform (Render, Fly, Railway) or using Trigger.dev's own hosting/integrations.
+
+
+## Features
+
+- Visual node-based workflow builder (6 prebuilt nodes: Text, Upload Image, Upload Video, Run Any LLM, Crop Image, Extract Frame)
+- Per-node handle coloring and node palette
+- React Flow canvas with pan/zoom, grid dots, and minimap
+- Live node search and quick-add in the left sidebar
+- Persisted workflows and run history in PostgreSQL via Prisma
+- Run scopes: full workflow, selected nodes, or single node
+- Background execution through Trigger worker (LLM calls, media processing, Transloadit orchestration)
+- Authentication with Clerk
+- Import / export workflows
+- Undo/redo and keyboard interactions
+
