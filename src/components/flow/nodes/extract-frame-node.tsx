@@ -22,7 +22,7 @@ function ExtractFrameNode({ id, data, selected }: NodeProps) {
       <div className="space-y-3">
         {/* Video URL Field */}
         <label className="block space-y-1">
-          <span className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">
+          <span className="text-[11px] uppercase tracking-[0.14em] text-text4">
             {videoConnected ? "Video (connected)" : "Video URL"}
           </span>
           <input
@@ -31,13 +31,13 @@ function ExtractFrameNode({ id, data, selected }: NodeProps) {
             disabled={videoConnected}
             onChange={(e) => updateNodeValue(id, "video_url", e.target.value)}
             placeholder="Video URL"
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5 disabled:cursor-not-allowed disabled:opacity-40"
           />
         </label>
 
         {/* Timestamp Field */}
         <label className="block space-y-1">
-          <span className="text-[11px]  tracking-[0.14em] text-zinc-400">
+          <span className="text-[11px]  tracking-[0.14em] text-text4">
             {timestampConnected ? "TIMESTAMP(connected)" : "TIMESTAMP (Seconds or percentage)"}
           </span>
           <input
@@ -45,25 +45,25 @@ function ExtractFrameNode({ id, data, selected }: NodeProps) {
             disabled={timestampConnected}
             onChange={(e) => updateNodeValue(id, "timestamp", e.target.value)}
             placeholder="(e.g., 0, 30, 50%)"
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="w-full rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5 disabled:cursor-not-allowed disabled:opacity-40"
           />
         </label>
 
         {/* Info */}
-        <p className="text-[11px] text-zinc-400">Enter seconds (e.g., 5) or percentage (e.g., 25%)</p>
+        <p className="text-[11px] text-text4">Enter seconds (e.g., 5) or percentage (e.g., 25%)</p>
 
         {typedData.outputs.output && (
           <div className="space-y-2">
             <img
               src={typedData.outputs.output}
               alt="Extracted frame"
-              className="h-28 w-full rounded-xl border border-zinc-700 bg-zinc-950 object-cover"
+              className="h-28 w-full rounded-xl border border-text7 bg-text95 object-cover"
             />
             <a
               href={typedData.outputs.output}
               target="_blank"
               rel="noreferrer"
-              className="block truncate rounded-lg border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] text-zinc-300 hover:text-zinc-100"
+              className="block truncate rounded-lg border border-text7 bg-text95 px-2 py-1 text-[11px] text-text3 hover:text-text1"
               title={typedData.outputs.output}
             >
               {typedData.outputs.output}

@@ -1,6 +1,100 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
+
+  /* Core Colors */
+  --primary: white;
+  --secondary: black;
+  
+  --text1: 20 20 20;
+  --text2: 51 51 51;
+  --text3: 80 80 80;
+  --text4: 120 120 120;
+  --text5: 160 160 160;
+  --text7: 200 200 200;
+  --text9: 230 230 230;
+  --text95: 245 245 245;
+  
+  --primary_bg: #f9f9f9;
+  --cardbg1: #f3f3f3;
+  --cardhoverbg: #f0f0f0;
+  --buttonbg: #e8e8e840;
+  --buttonhoverbg: #e0e0e0;
+  --canvabg: #f5f5f540;
+  --nodebg: #fafafa;
+
+  /* Fonts */
+  --font-sans: "Suisse Intl", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
+
+  --font-mono: "Suisse Intl Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Core Colors */
+  --primary: black;
+  --secondary: white;
+  
+  --text1: 244 244 245;
+  --text2: 228 228 231;
+  --text3: 212 212 216;
+  --text4: 161 161 170;
+  --text5: 113 113 122;
+  --text7: 63 63 70;
+  --text9: 24 24 27;
+  --text95: 9 9 11;
+  
+  --primary_bg: #111111;
+  --cardbg1: #1b1b1b;
+  --cardhoverbg: #1e1e1e;
+  --buttonbg: #625c5c40;
+  --buttonhoverbg: #1a1c23;
+  --canvabg: #46464640;
+  --nodebg: #1f1f1f;
+}
+
+@theme inline {
+  /* Core */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  
+  --color-text1: rgb(var(--text1));
+  --color-text2: rgb(var(--text2));
+  --color-text3: rgb(var(--text3));
+  --color-text4: rgb(var(--text4));
+  --color-text5: rgb(var(--text5));
+  --color-text7: rgb(var(--text7));
+  --color-text9: rgb(var(--text9));
+  --color-text95: rgb(var(--text95));
+  
+  --color-primary_bg: var(--primary_bg);
+  --color-cardbg1: var(--cardbg1);
+  --color-cardhoverbg: var(--cardhoverbg);
+  --color-buttonbg: var(--buttonbg);
+  --color-buttonhoverbg: var(--buttonhoverbg);
+  --color-canvabg: var(--canvabg);
+  --color-nodebg: var(--nodebg);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* :root {
   --background: #090b09;
   --foreground: #e6e6e6;
   --font-sans: "Suisse Intl", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -14,7 +108,7 @@
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
-}
+} */
 
 body {
   background: var(--background);

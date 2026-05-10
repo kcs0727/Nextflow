@@ -15,10 +15,10 @@ export function NodeShell({ title, status, error, selected, children }: NodeShel
   return (
     <div
       className={cn(
-        "relative w-[300px] rounded-2xl border border-white/10 bg-[#11131a]/95 p-4 text-zinc-100 shadow-[0_16px_36px_rgba(0,0,0,0.48)] backdrop-blur-md transition-all duration-300",
+        "relative w-[300px] rounded-2xl border border-secondary/10 bg-nodebg p-4 text-text1 backdrop-blur-md transition-all duration-300",
         selected &&
-          "border-white/70 bg-[#151922]/98 ring-2 ring-white/70 shadow-[0_0_0_1px_rgba(255,255,255,0.28),0_0_28px_rgba(255,255,255,0.18),0_18px_40px_rgba(0,0,0,0.5)]",
-        status === "running" && "animate-node-pulse ring-2 ring-blue-400/70 shadow-[0_0_0_2px_rgba(78,126,255,0.2),0_16px_36px_rgba(0,0,0,0.5)]",
+          "border-secondary/70 ring-2 ring-white/70",
+        status === "running" && "animate-node-pulse ring-2 ring-blue-500/90 shadow-[0_0_0_2px_rgba(78,126,255,0.2),0_16px_36px_rgba(0,0,0,0.5)]",
         status === "failed" && "ring-1 ring-rose-400/70",
       )}
       style={
@@ -30,9 +30,9 @@ export function NodeShell({ title, status, error, selected, children }: NodeShel
       }
     >
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-300">{title}</h3>
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text3">{title}</h3>
         {status === "running" ? (
-          <Loader2 className="h-4 w-4 animate-spin text-blue-300" />
+          <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
         ) : null}
       </div>
 

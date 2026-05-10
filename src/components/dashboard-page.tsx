@@ -114,7 +114,7 @@ export function DashboardPage() {
     };
 
     return (
-        <main className="min-h-screen bg-[#111111] ">
+        <main className="min-h-screen bg-primary_bg">
 
             <section className="relative border-b border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_28%),linear-gradient(180deg,#121318_0%,#090a0d_100%)]">
 
@@ -189,7 +189,7 @@ export function DashboardPage() {
             </section>
 
             <section className="mx-auto max-w-[1440px] px-6 py-8 lg:px-10">
-                <div className="flex flex-col gap-6 border-b border-white/8 pb-6 xl:flex-row xl:items-center xl:justify-between">
+                <div className="flex flex-col gap-6 border-b border-secondary/8 pb-6 xl:flex-row xl:items-center xl:justify-between">
                     <div className="flex flex-wrap items-center gap-2">
                         {TABS.map((tab) => (
                             <button
@@ -197,7 +197,7 @@ export function DashboardPage() {
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
                                     "rounded-xl px-4 py-2 text-sm transition",
-                                    activeTab === tab ? "bg-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.06)]" : "text-white hover:bg-white/5 hover:text-zinc-200",
+                                    activeTab === tab ? "bg-secondary/10 shadow-[0_0_0_1px_rgba(255,255,255,0.06)]" : "text-secondary hover:bg-secondary/5 hover:text-text2",
                                 )}
                             >
                                 {tab}
@@ -206,27 +206,27 @@ export function DashboardPage() {
                     </div>
 
                     <div className="flex flex-1 flex-wrap items-center gap-3 xl:justify-end">
-                        <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-3 py-2 text-zinc-400 xl:max-w-sm xl:flex-none">
+                        <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-xl border border-secondary/10 bg-secondary/4 px-3 py-2 text-text4 xl:max-w-sm xl:flex-none">
                             <Search className="h-4 w-4" />
                             <input
                                 value={search}
                                 onChange={(event) => setSearch(event.target.value)}
-                                className="w-full bg-transparent text-sm text-zinc-100 outline-none placeholder:text-zinc-500"
+                                className="w-full bg-transparent text-sm text-text1 outline-none placeholder:text-text5"
                                 placeholder="Search projects..."
                             />
                         </div>
-                        <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/4 px-3 py-2 text-sm font-semibold text-zinc-200 transition hover:bg-white/8">
+                        <button className="inline-flex items-center gap-2 rounded-xl border border-secondary/10 bg-secondary/4 px-3 py-2 text-sm font-semibold text-text2 transition hover:bg-secondary/8">
                             <LayoutGrid className="h-4 w-4" />
                             Last viewed
                         </button>
-                        <button className="rounded-xl border border-white/10 bg-white/4 p-2 text-zinc-300 transition hover:bg-white/8">
+                        <button className="rounded-xl border border-secondary/10 bg-secondary/4 p-2 text-text3 transition hover:bg-secondary/8">
                             <Eye className="h-4 w-4" />
                         </button>
                     </div>
                 </div>
 
                 {activeTab !== "Projects" ? (
-                    <div className="mt-8 rounded-[1.5rem] border border-dashed border-white/10 bg-white/4 p-8 text-sm text-zinc-400">
+                    <div className="mt-8 rounded-[1.5rem] border border-dashed border-secondary/10 bg-secondary/4 p-8 text-sm text-text4">
                         This tab is ready for future content.
                     </div>
                 ) : (
@@ -234,26 +234,26 @@ export function DashboardPage() {
                         {isSignedIn ? (
                             <button
                                 onClick={createWorkflow}
-                                className="group flex min-h-[260px] flex-col justify-between rounded-md border border-white/8 bg-[#1b1b1b] p-4 text-left transition hover:-translate-y-1 hover:border-white/14 hover:bg-[#1e1e1e]"
+                                className="group flex min-h-[260px] flex-col justify-between rounded-md border border-secondary/8 bg-cardbg1 p-4 text-left transition hover:-translate-y-1 hover:border-secondary/14 hover:bg-cardhoverbg"
                             >
                                 <div className="flex items-start justify-between">
-                                    <span className="rounded-full border border-white/10 bg-white/5 p-2 text-white/90">
+                                    <span className="rounded-full border border-secondary/10 bg-secondary/5 p-2 text-secondary/90">
                                         <FolderPlus className="h-4 w-4" />
                                     </span>
-                                    <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-black">New</span>
+                                    <span className="rounded-full bg-secondary px-2 py-1 text-[11px] font-semibold text-primary">New</span>
                                 </div>
                                 <div className="flex justify-center">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-full border border-white/15 bg-white text-2xl text-black pb-1">+</div>
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-full border border-secondary/15 bg-secondary text-2xl text-primary pb-1">+</div>
                                 </div>
                                 <div>
-                                    <p className="text-lg font-semibold text-white">New Workflow</p>
-                                    <p className="mt-1 text-sm text-zinc-400">Start from a blank canvas.</p>
+                                    <p className="text-lg font-semibold text-secondary">New Workflow</p>
+                                    <p className="mt-1 text-sm text-text4">Start from a blank canvas.</p>
                                 </div>
                             </button>
                         ) : null}
 
                         {loading && isSignedIn ? (
-                            <div className="col-span-full rounded-[1.75rem] border border-white/8 bg-[#12131a] p-6 text-sm text-zinc-400">Loading saved workflows...</div>
+                            <div className="col-span-full rounded-[1.75rem] border border-secondary/8 bg-cardbg1 p-6 text-sm text-text4">Loading saved workflows...</div>
                         ) : null}
 
                         {isSignedIn && filteredWorkflows.map((workflow) => (
@@ -268,10 +268,10 @@ export function DashboardPage() {
                                         openWorkflow(workflow.id);
                                     }
                                 }}
-                                className="group relative flex min-h-[260px] cursor-pointer flex-col justify-between rounded-md border border-white/8 bg-[#1b1b1b] p-4 transition hover:-translate-y-1 hover:border-white/14 hover:bg-[#1e1e1e]"
+                                className="group relative flex min-h-[260px] cursor-pointer flex-col justify-between rounded-md border border-secondary/8 bg-cardbg1 p-4 transition hover:-translate-y-1 hover:border-secondary/14 hover:bg-cardhoverbg"
                             >
                                 <div className="flex items-start justify-between gap-3">
-                                    <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/12 to-white/5 p-3 text-zinc-200">
+                                    <div className="rounded-2xl border border-secondary/10 bg-gradient-to-br from-secondary/12 to-secondary/5 p-3 text-text2">
                                         <WandSparkles className="h-5 w-5" />
                                     </div>
                                     <div className="relative">
@@ -280,7 +280,7 @@ export function DashboardPage() {
                                                 event.stopPropagation();
                                                 setMenuWorkflowId((current) => (current === workflow.id ? null : workflow.id));
                                             }}
-                                            className="rounded-full border border-white/10 bg-white/5 p-2 text-zinc-300 opacity-100 transition hover:bg-white/10 group-hover:opacity-100"
+                                            className="rounded-full border border-secondary/10 bg-secondary/5 p-2 text-text3 opacity-100 transition hover:bg-secondary/10 group-hover:opacity-100"
                                         >
                                             <MoreVertical className="h-4 w-4" />
                                         </button>
@@ -288,11 +288,11 @@ export function DashboardPage() {
                                         {menuWorkflowId === workflow.id ? (
                                             <div
                                                 onClick={(event) => event.stopPropagation()}
-                                                className="absolute right-0 top-11 z-20 w-44 rounded-2xl border border-white/10 bg-[#0f1015] p-2 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+                                                className="absolute right-0 top-11 z-20 w-44 rounded-2xl border border-secondary/10 bg-primary p-2 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
                                             >
                                                 <button
                                                     onClick={() => beginRename(workflow)}
-                                                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-zinc-200 transition hover:bg-white/8"
+                                                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-text2 transition hover:bg-secondary/8"
                                                 >
                                                     Rename
                                                 </button>
@@ -309,30 +309,30 @@ export function DashboardPage() {
                                 </div>
 
                                 <div>
-                                    <p className="text-lg font-semibold text-white">{workflow.name}</p>
-                                    <p className="mt-1 text-sm text-zinc-400">Updated {formatDistanceToNow(new Date(workflow.updatedAt), { addSuffix: true })}</p>
-                                    <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
+                                    <p className="text-lg font-semibold text-secondary">{workflow.name}</p>
+                                    <p className="mt-1 text-sm text-text4">Updated {formatDistanceToNow(new Date(workflow.updatedAt), { addSuffix: true })}</p>
+                                    <div className="mt-4 flex items-center gap-2 text-xs text-text5">
                                         <span>{workflow.runCount ?? 0} runs</span>
-                                        <span className="h-1 w-1 rounded-full bg-zinc-600" />
+                                        <span className="h-1 w-1 rounded-full bg-text6" />
                                         <span>Created {formatDistanceToNow(new Date(workflow.createdAt), { addSuffix: true })}</span>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between text-xs text-zinc-500">
+                                <div className="flex items-center justify-between text-xs text-text5">
                                     <span>Open editor</span>
-                                    <ChevronRight className="h-4 w-4 text-zinc-400 transition group-hover:translate-x-0.5 group-hover:text-white" />
+                                    <ChevronRight className="h-4 w-4 text-text4 transition group-hover:translate-x-0.5 group-hover:text-secondary" />
                                 </div>
                             </div>
                         ))}
 
                         {!loading && isSignedIn && filteredWorkflows.length === 0 ? (
-                            <div className="col-span-full p-8 text-center text-md text-zinc-400">
+                            <div className="col-span-full p-8 text-center text-md text-text4">
                                 No workflows found. Create a new workflow to get started.
                             </div>
                         ) : null}
 
                         {!isSignedIn ? (
-                            <div className="col-span-full p-8 text-center text-md text-zinc-400">
+                            <div className="col-span-full p-8 text-center text-md text-text4">
                                 Sign in to view and manage saved workflows.
                             </div>
                         ) : null}
@@ -349,28 +349,28 @@ export function DashboardPage() {
             ) : null}
 
             {renameWorkflowId ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm" onClick={() => setRenameWorkflowId(null)}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 px-4 backdrop-blur-sm" onClick={() => setRenameWorkflowId(null)}>
                     <div
-                        className="w-full max-w-md rounded-[1.5rem] border border-white/10 bg-[#11131a] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+                        className="w-full max-w-md rounded-[1.5rem] border border-secondary/10 bg-[#11131a] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <h2 className="text-lg font-semibold text-white">Rename workflow</h2>
-                        <p className="mt-1 text-sm text-zinc-400">Choose a new name for this dashboard card.</p>
+                        <h2 className="text-lg font-semibold text-secondary">Rename workflow</h2>
+                        <p className="mt-1 text-sm text-text4">Choose a new name for this dashboard card.</p>
                         <input
                             value={renameValue}
                             onChange={(event) => setRenameValue(event.target.value)}
                             autoFocus
-                            className="mt-4 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-500"
+                            className="mt-4 w-full rounded-2xl border border-secondary/10 bg-secondary/5 px-4 py-3 text-sm text-text1 outline-none placeholder:text-text5"
                             placeholder="Workflow name"
                         />
                         <div className="mt-4 flex justify-end gap-3">
                             <button
                                 onClick={() => setRenameWorkflowId(null)}
-                                className="rounded-2xl border border-white/10 px-4 py-2 text-sm text-zinc-300 transition hover:bg-white/8"
+                                className="rounded-2xl border border-secondary/10 px-4 py-2 text-sm text-text3 transition hover:bg-secondary/8"
                             >
                                 Cancel
                             </button>
-                            <button onClick={() => void saveRename()} className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-zinc-200">
+                            <button onClick={() => void saveRename()} className="rounded-2xl bg-secondary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-text2">
                                 Save
                             </button>
                         </div>

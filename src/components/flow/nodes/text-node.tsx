@@ -18,7 +18,7 @@ function TextNode({ id, data, selected }: NodeProps) {
                 value={value}
                 onChange={(e) => updateNodeValue(id, "text", e.target.value)}
                 placeholder="Enter text..."
-                className="h-28 w-full resize-none rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+                className="h-28 w-full resize-none rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5"
             />
             <OutputHandle id="output" top="80%" label="text" />
         </NodeShell>

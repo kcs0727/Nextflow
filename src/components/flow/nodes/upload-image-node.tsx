@@ -50,7 +50,7 @@ function UploadImageNode({ id, data, selected }: NodeProps) {
             <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-600 bg-zinc-950/50 px-3 py-4 text-sm text-zinc-400 transition hover:border-zinc-500 hover:bg-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 rounded-xl  bg-text95/50 px-3 py-4 text-sm text-text4 transition hover:border-text5 hover:bg-text95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <Upload className="h-4 w-4" />
                 {isUploading ? "Uploading..." : "Click to upload image"}
@@ -73,14 +73,14 @@ function UploadImageNode({ id, data, selected }: NodeProps) {
 
             {url && (
                 <div className="space-y-2">
-                    <div className="relative h-32 w-full overflow-hidden rounded-xl border border-zinc-700 bg-zinc-950">
+                    <div className="relative h-32 w-full overflow-hidden rounded-xl border border-text7 bg-text95">
                         <Image src={url} alt="Uploaded" fill className="object-cover" unoptimized />
                     </div>
                     <a
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="block truncate rounded-lg border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] text-zinc-300 hover:text-zinc-100"
+                        className="block truncate rounded-lg border border-text7 bg-text95 px-2 py-1 text-[11px] text-text3 hover:text-text1"
                         title={url}
                     >
                         {url}

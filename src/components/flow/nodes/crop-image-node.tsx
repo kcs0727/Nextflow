@@ -25,7 +25,7 @@ function NumberField({
 
     return (
         <label className="block space-y-1">
-            <span className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">{label}</span>
+            <span className="text-[11px] uppercase tracking-[0.14em] text-text4">{label}</span>
             <input
                 type="number"
                 value={data.values[keyName] ?? ""}
@@ -34,7 +34,7 @@ function NumberField({
                 disabled={disabled}
                 min="0"
                 max="100"
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-40"
+                className="w-full rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5 disabled:cursor-not-allowed disabled:opacity-40"
             />
         </label>
     );
@@ -57,7 +57,7 @@ function CropImageNode({ id, data, selected }: NodeProps) {
             <div className="space-y-3">
                 {/* Image URL Field */}
                 <label className="block space-y-1">
-                    <span className="text-[11px] uppercase tracking-[0.14em] text-zinc-400">
+                    <span className="text-[11px] uppercase tracking-[0.14em] text-text4">
                         {imageConnected ? "Image (connected)" : "Image URL"}
                     </span>
                     <input
@@ -66,7 +66,7 @@ function CropImageNode({ id, data, selected }: NodeProps) {
                         disabled={imageConnected}
                         onChange={(e) => updateNodeValue(id, "image_url", e.target.value)}
                         placeholder="Image URL"
-                        className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="w-full rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5 disabled:cursor-not-allowed disabled:opacity-40"
                     />
                 </label>
 
@@ -91,20 +91,20 @@ function CropImageNode({ id, data, selected }: NodeProps) {
                 </div>
 
                 {/* Info */}
-                <p className="text-[11px] text-zinc-400">Crop area: 0-100% for each parameter</p>
+                <p className="text-[11px] text-text4">Crop area: 0-100% for each parameter</p>
 
                 {typedData.outputs.output && (
                     <div className="space-y-2">
                         <img
                             src={typedData.outputs.output}
                             alt="Cropped output"
-                            className="h-28 w-full rounded-xl border border-zinc-700 bg-zinc-950 object-cover"
+                            className="h-28 w-full rounded-xl border border-text7 bg-text95 object-cover"
                         />
                         <a
                             href={typedData.outputs.output}
                             target="_blank"
                             rel="noreferrer"
-                            className="block truncate rounded-lg border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] text-zinc-300 hover:text-zinc-100"
+                            className="block truncate rounded-lg border border-text7 bg-text95 px-2 py-1 text-[11px] text-text3 hover:text-text1"
                             title={typedData.outputs.output}
                         >
                             {typedData.outputs.output}
