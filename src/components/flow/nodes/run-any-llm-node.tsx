@@ -62,9 +62,9 @@ function RunAnyLlmNode({ id, data, selected }: NodeProps) {
     return (
         <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
             {/* Input Handles with labels */}
-            <InputHandle id="system_prompt" top="45%" label="system" />
-            <InputHandle id="user_message" top="75%" label="message" />
-            <InputHandle id="images" top="90%" label="images" />
+            <InputHandle id="system_prompt" top="45%" label="system" kind={typedData.kind} tone="orange" />
+            <InputHandle id="user_message" top="75%" label="message" kind={typedData.kind} tone="orange" />
+            <InputHandle id="images" top="90%" label="images" kind={typedData.kind} />
 
             <div className="space-y-3">
                 {/* Model Selector */}
@@ -146,7 +146,7 @@ function RunAnyLlmNode({ id, data, selected }: NodeProps) {
                 )}
             </div>
 
-            <OutputHandle id="output" top="92%" label="text" />
+            <OutputHandle id="output" top="92%" label="text" kind={typedData.kind} />
         </NodeShell>
     );
 }

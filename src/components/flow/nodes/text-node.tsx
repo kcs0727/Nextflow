@@ -20,7 +20,7 @@ function TextNode({ id, data, selected }: NodeProps) {
                 placeholder="Enter text..."
                 className="h-28 w-full resize-none rounded-xl border border-text7 bg-text95 px-3 py-2 text-sm text-text1 outline-none transition focus:border-text5"
             />
-            <OutputHandle id="output" top="80%" label="text" />
+            <OutputHandle id="output" top="80%" label="text" kind={typedData.kind} />
         </NodeShell>
     );
 }

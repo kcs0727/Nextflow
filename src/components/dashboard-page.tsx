@@ -29,6 +29,11 @@ export function DashboardPage() {
     const [menuWorkflowId, setMenuWorkflowId] = useState<string | null>(null);
     const [renameWorkflowId, setRenameWorkflowId] = useState<string | null>(null);
     const [renameValue, setRenameValue] = useState("");
+    const [isSavingRename, setIsSavingRename] = useState(false);
+    const [deleteWorkflowId, setDeleteWorkflowId] = useState<string | null>(null);
+    const [deleteWorkflowName, setDeleteWorkflowName] = useState("");
+    const [isDeletingWorkflow, setIsDeletingWorkflow] = useState(false);
+    const [isConfirmingSignout, setIsConfirmingSignout] = useState(false);
 
     useEffect(() => {
         if (!isSignedIn) {
@@ -81,36 +86,50 @@ export function DashboardPage() {
         setMenuWorkflowId(null);
     };
 
+    const beginDelete = (workflow: WorkflowCard) => {
+        setDeleteWorkflowId(workflow.id);
+        setDeleteWorkflowName(workflow.name);
+        setMenuWorkflowId(null);
+    };
+
     const saveRename = async () => {
         if (!renameWorkflowId) return;
 
         const nextName = renameValue.trim();
         if (!nextName) return;
 
-        const response = await fetch(`/api/workflows/${renameWorkflowId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: nextName }),
-        });
+        setIsSavingRename(true);
+        try {
+            const response = await fetch(`/api/workflows/${renameWorkflowId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: nextName }),
+            });
 
-        if (response.ok) {
-            setWorkflows((current) => current.map((workflow) => (workflow.id === renameWorkflowId ? { ...workflow, name: nextName } : workflow)));
+            if (response.ok) {
+                setWorkflows((current) => current.map((workflow) => (workflow.id === renameWorkflowId ? { ...workflow, name: nextName } : workflow)));
+                setRenameWorkflowId(null);
+                setRenameValue("");
+            }
+        } finally {
+            setIsSavingRename(false);
         }
-
-        setRenameWorkflowId(null);
-        setRenameValue("");
     };
 
-    const deleteWorkflow = async (workflowId: string) => {
-        const confirmed = window.confirm("Delete this workflow? This cannot be undone.");
-        if (!confirmed) return;
+    const confirmDeleteWorkflow = async () => {
+        if (!deleteWorkflowId) return;
 
-        const response = await fetch(`/api/workflows/${workflowId}`, { method: "DELETE" });
-        if (response.ok) {
-            setWorkflows((current) => current.filter((workflow) => workflow.id !== workflowId));
+        setIsDeletingWorkflow(true);
+        try {
+            const response = await fetch(`/api/workflows/${deleteWorkflowId}`, { method: "DELETE" });
+            if (response.ok) {
+                setWorkflows((current) => current.filter((workflow) => workflow.id !== deleteWorkflowId));
+                setDeleteWorkflowId(null);
+                setDeleteWorkflowName("");
+            }
+        } finally {
+            setIsDeletingWorkflow(false);
         }
-
-        setMenuWorkflowId(null);
     };
 
     return (
@@ -137,10 +156,7 @@ export function DashboardPage() {
                                 </button>
                                 {isSignedIn ? (
                                     <button
-                                        onClick={() => {
-                                            setWorkflows([]);
-                                            void signOut();
-                                        }}
+                                        onClick={() => setIsConfirmingSignout(true)}
                                         className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                                     >
                                         Sign Out
@@ -156,7 +172,7 @@ export function DashboardPage() {
                         </div>
 
                         <div className="hidden w-[560px] shrink-0 xl:block">
-                            <div className="relative h-[350px] rounded-[2rem] border border-white/8 bg-white/5 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                            <div className="relative h-[350px] rounded-[2rem] border border-white/8 bg-white/5 p-6 backdrop-blur-xl">
                                 <div className="absolute left-6 top-6 h-44 w-44 rounded-full bg-cyan-400/15 blur-3xl" />
                                 <div className="absolute right-10 top-8 h-36 w-36 rounded-full bg-amber-300/10 blur-3xl" />
                                 <div className="grid h-[280px] grid-cols-3 gap-4">
@@ -268,7 +284,10 @@ export function DashboardPage() {
                                         openWorkflow(workflow.id);
                                     }
                                 }}
-                                className="group relative flex min-h-[260px] cursor-pointer flex-col justify-between rounded-md border border-secondary/8 bg-cardbg1 p-4 transition hover:-translate-y-1 hover:border-secondary/14 hover:bg-cardhoverbg"
+                                className={cn(
+                                    "group relative flex min-h-[260px] cursor-pointer flex-col justify-between rounded-md border border-secondary/8 bg-cardbg1 p-4 transition hover:-translate-y-1 hover:border-secondary/14 hover:bg-cardhoverbg",
+                                    menuWorkflowId === workflow.id && "z-30",
+                                )}
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="rounded-2xl border border-secondary/10 bg-gradient-to-br from-secondary/12 to-secondary/5 p-3 text-text2">
@@ -288,16 +307,24 @@ export function DashboardPage() {
                                         {menuWorkflowId === workflow.id ? (
                                             <div
                                                 onClick={(event) => event.stopPropagation()}
-                                                className="absolute right-0 top-11 z-20 w-44 rounded-2xl border border-secondary/10 bg-primary p-2 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+                                                className="absolute right-0 top-11 z-50 w-44 rounded-2xl border border-secondary/10 bg-primary p-2"
                                             >
                                                 <button
-                                                    onClick={() => beginRename(workflow)}
+                                                    type="button"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        beginRename(workflow);
+                                                    }}
                                                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-text2 transition hover:bg-secondary/8"
                                                 >
                                                     Rename
                                                 </button>
                                                 <button
-                                                    onClick={() => deleteWorkflow(workflow.id)}
+                                                    type="button"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        beginDelete(workflow);
+                                                    }}
                                                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-rose-300 transition hover:bg-rose-500/10"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -341,17 +368,17 @@ export function DashboardPage() {
             </section>
 
             {menuWorkflowId ? (
-                <button
-                    aria-label="Close workflow actions menu"
+                <div
+                    aria-hidden="true"
                     onClick={() => setMenuWorkflowId(null)}
-                    className="fixed inset-0 z-10 cursor-default bg-transparent"
+                    className="fixed inset-0 z-20 bg-transparent"
                 />
             ) : null}
 
             {renameWorkflowId ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 px-4 backdrop-blur-sm" onClick={() => setRenameWorkflowId(null)}>
                     <div
-                        className="w-full max-w-md rounded-[1.5rem] border border-secondary/10 bg-[#11131a] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+                        className="w-full max-w-md rounded-[1.5rem] border border-secondary/10 bg-dialogbg p-5"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <h2 className="text-lg font-semibold text-secondary">Rename workflow</h2>
@@ -366,12 +393,88 @@ export function DashboardPage() {
                         <div className="mt-4 flex justify-end gap-3">
                             <button
                                 onClick={() => setRenameWorkflowId(null)}
+                                disabled={isSavingRename}
+                                className="rounded-2xl border border-secondary/10 px-4 py-2 text-sm text-text3 transition hover:bg-secondary/8 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => void saveRename()}
+                                disabled={isSavingRename}
+                                className="rounded-2xl bg-secondary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-text2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSavingRename ? "Saving..." : "Save"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+
+            {isConfirmingSignout ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 px-4 backdrop-blur-sm" onClick={() => setIsConfirmingSignout(false)}>
+                    <div
+                        className="w-full max-w-md rounded-[1.5rem] border border-secondary/10 bg-dialogbg p-5"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <h2 className="text-lg font-semibold text-secondary">Sign out</h2>
+                        <p className="mt-1 text-sm text-text4">Are you sure you want to sign out? You'll need to sign in again to access your workflows.</p>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsConfirmingSignout(false)}
                                 className="rounded-2xl border border-secondary/10 px-4 py-2 text-sm text-text3 transition hover:bg-secondary/8"
                             >
                                 Cancel
                             </button>
-                            <button onClick={() => void saveRename()} className="rounded-2xl bg-secondary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-text2">
-                                Save
+                            <button
+                                onClick={() => {
+                                    setWorkflows([]);
+                                    setIsConfirmingSignout(false);
+                                    void signOut();
+                                }}
+                                className="rounded-2xl bg-rose-500/20 px-4 py-2 text-sm font-semibold text-rose-300 transition hover:bg-rose-500/30"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+
+            {deleteWorkflowId ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 px-4 backdrop-blur-sm" onClick={() => !isDeletingWorkflow && setDeleteWorkflowId(null)}>
+                    <div
+                        className="w-full max-w-md rounded-[1.5rem] border border-secondary/10 bg-dialogbg p-5"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3 text-rose-300">
+                                <Trash2 className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h2 className="text-lg font-semibold text-secondary">Delete workflow</h2>
+                                <p className="mt-1 text-sm text-text4">
+                                    Delete <span className="font-semibold text-text2">{deleteWorkflowName}</span>? This cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    if (isDeletingWorkflow) return;
+                                    setDeleteWorkflowId(null);
+                                    setDeleteWorkflowName("");
+                                }}
+                                disabled={isDeletingWorkflow}
+                                className="rounded-2xl border border-secondary/10 px-4 py-2 text-sm text-text3 transition hover:bg-secondary/8 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => void confirmDeleteWorkflow()}
+                                disabled={isDeletingWorkflow}
+                                className="rounded-2xl bg-rose-500/20 px-4 py-2 text-sm font-semibold text-rose-300 transition hover:bg-rose-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {isDeletingWorkflow ? "Deleting..." : "Delete"}
                             </button>
                         </div>
                     </div>

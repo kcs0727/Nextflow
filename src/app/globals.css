@@ -23,6 +23,7 @@
   --buttonhoverbg: #e0e0e0;
   --canvabg: #f5f5f540;
   --nodebg: #fafafa;
+  --dialogbg: #fcfcfc;
 
   /* Fonts */
   --font-sans: "Suisse Intl", ui-sans-serif, system-ui, sans-serif,
@@ -59,6 +60,7 @@
   --buttonhoverbg: #1a1c23;
   --canvabg: #46464640;
   --nodebg: #1f1f1f;
+  --dialogbg: #11131a;
 }
 
 @theme inline {
@@ -82,6 +84,7 @@
   --color-buttonhoverbg: var(--buttonhoverbg);
   --color-canvabg: var(--canvabg);
   --color-nodebg: var(--nodebg);
+  --color-dialogbg: var(--dialogbg);
 }
 
 body {

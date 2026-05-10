@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { Home, Sparkles, Search, Type, ImagePlus, Clapperboard, Crop, Film, PanelLeftClose, PanelLeftOpen, Zap } from "lucide-react";
+import { Home, Search, PanelLeftClose, PanelLeftOpen, Zap } from "lucide-react";
 import type { WorkflowNodeKind } from "@/types/workflow";
+import { NODE_OPTIONS } from "@/components/flow/node-metadata";
 
 type LeftSidebarProps = {
     onAddNode: (kind: WorkflowNodeKind) => void;
@@ -14,14 +15,7 @@ type LeftSidebarProps = {
     authenticated: boolean;
 };
 
-const QUICK_ACCESS: Array<{ kind: WorkflowNodeKind; label: string; icon: React.ReactNode }> = [
-    { kind: "text", label: "Text Node", icon: <Type className="h-4 w-4" /> },
-    { kind: "uploadImage", label: "Upload Image Node", icon: <ImagePlus className="h-4 w-4" /> },
-    { kind: "uploadVideo", label: "Upload Video Node", icon: <Clapperboard className="h-4 w-4" /> },
-    { kind: "runAnyLlm", label: "Run Any LLM Node", icon: <Sparkles className="h-4 w-4" /> },
-    { kind: "cropImage", label: "Crop Image Node", icon: <Crop className="h-4 w-4" /> },
-    { kind: "extractFrameFromVideo", label: "Extract Frame from Video Node", icon: <Film className="h-4 w-4" /> },
-];
+const QUICK_ACCESS = NODE_OPTIONS;
 
 export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onToggleCollapse, authenticated }: LeftSidebarProps) {
     const router = useRouter();
@@ -59,7 +53,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
 
                 <div className="mb-4 space-y-1 px-1">
                     <button onClick={() => router.push("/")} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-bold text-text1 transition-colors hover:bg-secondary/10">
-                        <Home className="h-4 w-4 text-text3" />
+                        <Home className="h-4 w-4 text-slate-700 dark:text-sky-300" />
                         {!collapsed ? <span>Home</span> : null}
                     </button>
                     <button
@@ -68,7 +62,7 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-text1 transition-colors hover:bg-secondary/10 disabled:opacity-40"
                         title="Load sample marketing workflow"
                     >
-                        <Zap className="h-4 w-4 text-text3" />
+                        <Zap className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                         {!collapsed ? <span>Sample Workflow</span> : null}
                     </button>
                 </div>
@@ -89,7 +83,10 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
 
                 <div className="space-y-1">
                     {!collapsed ? <p className="mb-4 px-2 text-[11px] uppercase tracking-[0.2em] text-text5">Quick Access</p> : null}
-                    {filteredQuickAccess.map((item) => (
+                    {filteredQuickAccess.map((item) => {
+                        const Icon = item.icon;
+
+                        return (
                         <button
                             key={item.kind}
                             onClick={() => onAddNode(item.kind)}
@@ -98,10 +95,11 @@ export function LeftSidebar({ onAddNode, onLoadSampleWorkflow, collapsed, onTogg
                             disabled={!authenticated}
                             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-text1 transition-colors hover:bg-secondary/10 disabled:opacity-40"
                         >
-                            <span className="text-text3">{item.icon}</span>
+                            <span className={item.iconClassName}><Icon className="h-4 w-4" /></span>
                             {!collapsed ? <span>{item.label}</span> : null}
                         </button>
-                    ))}
+                        );
+                    })}
                     {!collapsed && filteredQuickAccess.length === 0 ? (
                         <p className="px-3 py-2 text-sm text-text4">No matching nodes found.</p>
                     ) : null}

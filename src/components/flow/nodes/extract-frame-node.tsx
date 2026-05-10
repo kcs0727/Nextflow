@@ -16,8 +16,8 @@ function ExtractFrameNode({ id, data, selected }: NodeProps) {
     return (
       <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
       {/* Input Handles */}
-      <InputHandle id="video_url" top="35%" label="video" />
-      <InputHandle id="timestamp" top="70%" label="time" />
+      <InputHandle id="video_url" top="35%" label="video" kind={typedData.kind} />
+      <InputHandle id="timestamp" top="70%" label="time" kind={typedData.kind} tone="orange" />
 
       <div className="space-y-3">
         {/* Video URL Field */}
@@ -72,7 +72,7 @@ function ExtractFrameNode({ id, data, selected }: NodeProps) {
         )}
       </div>
 
-      <OutputHandle id="output" top="88%" label="image" />
+      <OutputHandle id="output" top="88%" label="image" kind={typedData.kind} />
     </NodeShell>
   );
 }

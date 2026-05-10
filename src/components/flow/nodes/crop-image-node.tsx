@@ -48,11 +48,11 @@ function CropImageNode({ id, data, selected }: NodeProps) {
     return (
         <NodeShell title={typedData.title} status={typedData.status} error={typedData.error} selected={selected}>
             {/* Input Handles */}
-            <InputHandle id="image_url" top="28%" label="image" />
-            <InputHandle id="x_percent" top="48%" label="x %" />
-            <InputHandle id="y_percent" top="58%" label="y %" />
-            <InputHandle id="width_percent" top="68%" label="width %" />
-            <InputHandle id="height_percent" top="78%" label="height %" />
+            <InputHandle id="image_url" top="28%" label="image" kind={typedData.kind} />
+            <InputHandle id="x_percent" top="48%" label="x %" kind={typedData.kind} tone="orange" />
+            <InputHandle id="y_percent" top="58%" label="y %" kind={typedData.kind} tone="orange" />
+            <InputHandle id="width_percent" top="68%" label="width %" kind={typedData.kind} tone="orange" />
+            <InputHandle id="height_percent" top="78%" label="height %" kind={typedData.kind} tone="orange" />
 
             <div className="space-y-3">
                 {/* Image URL Field */}
@@ -113,7 +113,7 @@ function CropImageNode({ id, data, selected }: NodeProps) {
                 )}
             </div>
 
-            <OutputHandle id="output" top="92%" label="image" />
+            <OutputHandle id="output" top="92%" label="image" kind={typedData.kind} />
         </NodeShell>
     );
 }

@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import { LeftSidebar } from "@/components/shell/left-sidebar";
 import { RightSidebar } from "@/components/shell/right-sidebar";
 import { nodeTypes } from "@/components/flow/node-types";
+import { NODE_OPTIONS } from "@/components/flow/node-metadata";
 import { executeScope } from "@/lib/executor";
 import { useWorkflowStore } from "@/store/workflow-store";
 import { createSampleWorkflow } from "@/lib/sample-workflow";
@@ -56,8 +57,10 @@ function WorkflowBuilderInner({ workflowId: routeWorkflowId }: { workflowId?: st
     const { theme: nextTheme, setTheme, resolvedTheme } = useTheme();
     const currentTheme = resolvedTheme ?? nextTheme ?? "dark";
     const [projectMenuOpen, setProjectMenuOpen] = useState(false);
+    const [addNodeMenuOpen, setAddNodeMenuOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const projectMenuRef = useRef<HTMLDivElement>(null);
+    const addNodeMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!projectMenuOpen) return;
@@ -76,6 +79,24 @@ function WorkflowBuilderInner({ workflowId: routeWorkflowId }: { workflowId?: st
             document.removeEventListener("touchstart", handlePointerDown);
         };
     }, [projectMenuOpen]);
+
+    useEffect(() => {
+        if (!addNodeMenuOpen) return;
+
+        const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+            const target = event.target;
+            if (addNodeMenuRef.current && target instanceof Node && !addNodeMenuRef.current.contains(target)) {
+                setAddNodeMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handlePointerDown);
+        document.addEventListener("touchstart", handlePointerDown);
+        return () => {
+            document.removeEventListener("mousedown", handlePointerDown);
+            document.removeEventListener("touchstart", handlePointerDown);
+        };
+    }, [addNodeMenuOpen]);
 
     useEffect(() => {
         if (!routeWorkflowId) {
@@ -487,16 +508,48 @@ function WorkflowBuilderInner({ workflowId: routeWorkflowId }: { workflowId?: st
                 </div>
 
                 <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-secondary/10 bg-buttonbg p-2 backdrop-blur-md">
-                    <button
-                        disabled={!isAuthenticated}
-                        className="rounded-xl hover:bg-buttonhoverbg p-2 text-text1 transition hover:text-text1 disabled:opacity-40 relative group"
-                        
-                    >
-                        <Plus className="h-5 w-5" />
-                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-text9 text-text1 text-xs px-2 py-1 rounded whitespace-nowrap">
-                            Add Node
-                        </span>
-                    </button>
+                    <div ref={addNodeMenuRef} className="relative">
+                        <button
+                            onClick={() => setAddNodeMenuOpen((value) => !value)}
+                            disabled={!isAuthenticated}
+                            className="group rounded-xl p-2 text-text1 transition hover:bg-buttonhoverbg hover:text-text1 disabled:opacity-40 relative"
+                            aria-expanded={addNodeMenuOpen}
+                            aria-haspopup="menu"
+                            title="Add Node"
+                        >
+                            <Plus className="h-5 w-5" />
+                            <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-text9 px-2 py-1 text-xs text-text1 opacity-0 transition-opacity group-hover:opacity-100">
+                                Add Node
+                            </span>
+                        </button>
+
+                        {addNodeMenuOpen ? (
+                            <div className="absolute bottom-[calc(100%+0.75rem)] left-1/2 w-72 -translate-x-1/2 rounded-2xl border border-secondary/10 bg-primary p-2 shadow-[0_24px_70px_rgba(0,0,0,0.35)]">
+                                <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.2em] text-text5">Add a node</p>
+                                <div className="space-y-1">
+                                    {NODE_OPTIONS.map((item) => {
+                                        const Icon = item.icon;
+
+                                        return (
+                                            <button
+                                                key={item.kind}
+                                                onClick={() => {
+                                                    addNode(item.kind);
+                                                    setAddNodeMenuOpen(false);
+                                                }}
+                                                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-text1 transition hover:bg-secondary/10"
+                                            >
+                                                <span className={item.iconClassName}>
+                                                    <Icon className="h-4 w-4" />
+                                                </span>
+                                                <span>{item.label}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
                     <button
                         onClick={() => setActiveTool("select")}
                         disabled={!isAuthenticated}

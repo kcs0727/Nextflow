@@ -66,7 +66,7 @@ function UploadImageNode({ id, data, selected }: NodeProps) {
 
             {uploadError && (
                 <p className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-900/30 px-3 py-2 text-[11px] text-rose-200">
-                    <TriangleAlert className="mt-[1px] h-3.5 w-3.5 shrink-0" />
+                    <TriangleAlert className="mt-px h-3.5 w-3.5 shrink-0" />
                     {uploadError}
                 </p>
             )}
@@ -88,7 +88,7 @@ function UploadImageNode({ id, data, selected }: NodeProps) {
                 </div>
             )}
 
-            <OutputHandle id="output" top="85%" label="image" />
+            <OutputHandle id="output" top="85%" label="image" kind={typedData.kind} />
         </NodeShell>
     );
 }
