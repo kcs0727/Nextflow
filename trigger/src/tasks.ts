@@ -10,6 +10,12 @@ import { uploadBufferViaTransloadit } from "./transloadit-server";
 
 type ExecutionInputs = Record<string, string | string[]>;
 
+async function fetchWithTimeout(input: string, timeoutMs = 60000) {
+    return await fetch(input as any, {
+        signal: AbortSignal.timeout(timeoutMs),
+    });
+}
+
 async function downloadToFile(source: string, filePath: string) {
     if (source.startsWith("data:")) {
         const match = source.match(/^data:([^;]+);base64,([\s\S]*)$/);
@@ -21,7 +27,7 @@ async function downloadToFile(source: string, filePath: string) {
         return match[1];
     }
 
-    const response = await fetch(source as any);
+    const response = await fetchWithTimeout(source);
     if (!response.ok) {
         throw new Error(`Failed to download media: ${response.status} ${response.statusText}`);
     }
@@ -38,8 +44,8 @@ function getFFmpegPath(): string {
         process.env.FFMPEG_PATH,
         process.env.FFMPEG_FROM_ARGS,
         ffmpegPath,
-        join(process.cwd(), "node_modules", "ffmpeg-static", "ffmpeg.exe"),
-        join(process.cwd(), "ffmpeg.exe"),
+        join(process.cwd(), "node_modules", "ffmpeg-static", process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"),
+        join(process.cwd(), process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"),
     ].filter((value): value is string => Boolean(value));
 
     for (const candidate of candidates) {
@@ -172,7 +178,7 @@ export const runAnyLlmTask = task({
         for (const imageUrl of images) {
             if (!imageUrl?.trim()) continue;
 
-            const response = await fetch(imageUrl as any);
+            const response = await fetchWithTimeout(imageUrl, 30000);
             if (!response.ok) {
                 continue;
             }

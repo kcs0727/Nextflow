@@ -36,6 +36,45 @@ function runStatusFromNodeRuns(nodeRuns: NodeRunHistory[]): HistoryStatus {
   return success ? "partial" : "failed";
 }
 
+type ExecuteStartResponse = {
+  runId?: string;
+  error?: string;
+};
+
+type ExecuteStatusResponse = {
+  status?: string;
+  isCompleted?: boolean;
+  isSuccess?: boolean;
+  output?: Record<string, string> | null;
+  error?: { message?: string } | null;
+};
+
+async function waitForTriggerRun(runId: string) {
+  while (true) {
+    const response = await fetch(`/api/execute?runId=${encodeURIComponent(runId)}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const body = (await response.json()) as ExecuteStatusResponse & { error?: string };
+
+    if (!response.ok) {
+      throw new Error(body.error ?? "Failed to retrieve Trigger run status");
+    }
+
+    if (!body.isCompleted) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      continue;
+    }
+
+    if (body.status === "COMPLETED" && body.isSuccess) {
+      return (body.output ?? {}) as Record<string, string>;
+    }
+
+    throw new Error(body.error?.message ?? `Trigger task failed with status ${body.status ?? "unknown"}`);
+  }
+}
+
 export async function executeScope(scope: HistoryScope) {
   const store = useWorkflowStore.getState();
   
@@ -83,13 +122,17 @@ export async function executeScope(scope: HistoryScope) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ kind: node.data.kind, inputs }),
           });
-          const body = await response.json();
+          const body = (await response.json()) as ExecuteStartResponse;
 
           if (!response.ok) {
             throw new Error(body.error ?? "Execution failed");
           }
 
-          const outputs = (body.outputs ?? {}) as Record<string, string>;
+          if (!body.runId) {
+            throw new Error("Trigger run id was not returned");
+          }
+
+          const outputs = await waitForTriggerRun(body.runId);
           for (const [key, val] of Object.entries(outputs)) {
             useWorkflowStore.getState().setNodeOutput(node.id, key, val);
           }

@@ -82,13 +82,20 @@ npm run dev
 
 3. Running in production
 
-The `trigger/` package.json exposes `start` which runs `node render-start.cjs` (for Render-style startup). For other hosts follow Trigger.dev deployment docs.
+Deploy the Trigger project with the Trigger.dev CLI for production:
+
+```bash
+cd trigger
+npx trigger.dev deploy
+```
+
+The `trigger/` package.json still includes `start` for Render-style self-hosting, but the production path in Trigger's docs is to deploy the tasks to Trigger.dev and trigger the deployed version with `TRIGGER_SECRET_KEY`.
 
 
 ## Deployment
 
 - App: Deploy the Next.js app to Vercel (recommended) or any hosting that supports Node and Next.js App Router.
-- Trigger worker: Deploy separately to a background worker platform (Render, Fly, Railway) or using Trigger.dev's own hosting/integrations.
+- Trigger worker: Deploy the Trigger project to Trigger.dev (recommended) or use a supported self-hosted setup; avoid relying on a sleeping free-tier worker process for production.
 
 
 ## Features
